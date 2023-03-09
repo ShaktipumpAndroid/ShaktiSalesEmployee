@@ -184,7 +184,6 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     }
 
     private void startCamera() {
-        Log.e("FrontCamera====>",getIntent().getStringExtra("FrontCamera"));
         if(getIntent().getExtras()!=null && getIntent().getStringExtra("FrontCamera").equals("1")) {
             camera = android.hardware.Camera.open(1);
             camera.setDisplayOrientation(90);
@@ -246,7 +245,6 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
         bitmap = saveImageWithTimeStamp(bytes);
         save = saveFile(bitmap,customer_name.trim(),customer_name.trim());
-        Log.e("save===>", String.valueOf(save));
 
     }
 

@@ -58,11 +58,8 @@ public class MarkAttendanceActivity extends AppCompatActivity {
     Context mContext;
     String Attendance_Mark = "", latLong;
     DatabaseHelper db = null;
-    String imageStoragePath;
     Button in_attendance, out_attendance;
     TextView tv_intime, tv_outtime;
-    Button sync;
-    File mFile;
     String Userid;
     AttendanceBean attendanceBean;
     public static final int BITMAP_SAMPLE_SIZE = 4;
@@ -82,51 +79,10 @@ public class MarkAttendanceActivity extends AppCompatActivity {
             android.Manifest.permission.RECORD_AUDIO,
             android.Manifest.permission.ACCESS_COARSE_LOCATION
     };
-    android.os.Handler mHandler = new android.os.Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            String mString = (String) msg.obj;
-            Toast.makeText(MarkAttendanceActivity.this, mString, Toast.LENGTH_LONG).show();
-        }
-    };
+
     private Toolbar mToolbar;
-
     private Uri fileUri; // file url to store image
-    private Uri NewfileUri; // file url to store image
 
-    private static File getOutputMediaFile(int type) {
-
-        // External sdcard location
-        File mediaStorageDir = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                WebURL.IMAGE_DIRECTORY_NAME);
-
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-//                Log.d(TAG, "Oops! Failed create "
-//                        + Config.IMAGE_DIRECTORY_NAME + " directory");
-                return null;
-            }
-        }
-
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.US).format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + "IMG_" + timeStamp + ".jpg");
-        } else {
-            return null;
-        }
-
-
-        return mediaFile;
-    }
 
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
@@ -162,12 +118,8 @@ public class MarkAttendanceActivity extends AppCompatActivity {
         Userid = LoginBean.getUseid();
         in_attendance = (Button) findViewById(R.id.in_attendance);
         out_attendance = (Button) findViewById(R.id.out_attendance);
-
         tv_intime = (TextView) findViewById(R.id.tv_intime);
         tv_outtime = (TextView) findViewById(R.id.tv_outtime);
-
-
-        //  sync = (Button) findViewById(R.id.sync);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         editor = pref.edit();
@@ -176,14 +128,10 @@ public class MarkAttendanceActivity extends AppCompatActivity {
         LoginBean.userid = pref.getString("key_username", "userid");
         LoginBean.username = pref.getString("key_ename", "username");
 
-
-
         getAttendnace();
-
 
         tv_intime.setText(attendanceBean.SERVER_DATE_IN + "  " + attendanceBean.IN_TIME);
         tv_outtime.setText(attendanceBean.SERVER_DATE_OUT + "  " + attendanceBean.OUT_TIME);
-
 
         if (TextUtils.isEmpty(attendanceBean.IN_TIME)) {
             tv_intime.setVisibility(View.INVISIBLE);
@@ -196,7 +144,6 @@ public class MarkAttendanceActivity extends AppCompatActivity {
         } else {
             tv_outtime.setVisibility(View.VISIBLE);
         }
-
 
         in_attendance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,7 +171,6 @@ public class MarkAttendanceActivity extends AppCompatActivity {
                 }
             }
         });
-
 
         out_attendance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -269,7 +215,6 @@ public class MarkAttendanceActivity extends AppCompatActivity {
 
             }
         });
-
 
     }
 
@@ -382,10 +327,8 @@ public class MarkAttendanceActivity extends AppCompatActivity {
 
         dataHelper.insertMarkAttendance(attendanceBean);
         SyncAttendanceInBackground();
-        // Sync Data
 
         new Capture_employee_gps_location(this, "2","");
-
 
         Toast.makeText(mContext, "In Attendance Marked", Toast.LENGTH_LONG).show();
 
@@ -393,257 +336,42 @@ public class MarkAttendanceActivity extends AppCompatActivity {
 
     }
 
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == Activity.RESULT_FIRST_USER) {
-//            String url = data.getStringExtra("url");
-//            if (requestCode == 100) {
-//                if (!TextUtils.isEmpty(url)) {
-//                    try {
-//                        mFile = new File(url);
-//                        boolean hi = mFile.isFile();
-//                        String path = mFile.getPath();
-//
-//
-//                        if (Attendance_Mark.equals("IN")) {
-//
-//
-//                            attendanceBean.IN_FILE_NAME = mFile.getName();
-//                            attendanceBean.IN_FILE_VALUE = mFile.getPath();
-//
-//// Log.d("in_file_name", "" + attendanceBean.IN_FILE_NAME + "----" + attendanceBean.IN_FILE_VALUE);
-//
-//                            if (mFile.getPath() != null) {
-//
-//
-////
-////                                BitmapFactory.Options options = new BitmapFactory.Options();
-//////                                // down sizing image as it throws OutOfMemory Exception for larger
-//////                                // images
-////                                options.inSampleSize = 8;
-//////
-////                                final Bitmap bitmap = BitmapFactory.decodeFile(mFile.getPath(), options);
-//////
-//////
-////////                                //            imgPreview.setImageBitmap(bitmap);
-//////
-////                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-////                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-////                                byte[] byteArray = stream.toByteArray();
-////
-////                                String encodedImage = Base64.encodeToString(byteArray , Base64.DEFAULT);
-//
-//                               /* convert image to string*/
-//                                attendanceBean.IN_IMAGE = CustomUtility.CompressImage(mFile.getPath()) ;
-//
-//                              //  Log.d("in_image", "" + attendanceBean.IN_IMAGE  );
-//
-//
-//                                File file = new File( mFile.getPath() );
-//                                if ( file.exists())
-//                                {
-//                                    file.delete();
-//                                }
-//
-//
-//                            }
-//
-//                           // Log.d("in_file_name", "" + attendanceBean.IN_FILE_NAME + "----" + attendanceBean.IN_FILE_VALUE);
-//
-//
-//                            saveLocally();
-//                        }
-//
-//
-//
-//
-//
-//                        if (Attendance_Mark.equals("OUT")) {
-//
-//                            attendanceBean.OUT_FILE_NAME = mFile.getName();
-//                            attendanceBean.OUT_FILE_VALUE = mFile.getPath();
-//
-//                          //  Log.d("out_file_name", "" + attendanceBean.OUT_FILE_NAME + "----" + attendanceBean.OUT_FILE_VALUE);
-//
-//
-//
-//                               /* convert image to string*/
-//                            attendanceBean.OUT_IMAGE = CustomUtility.CompressImage(mFile.getPath()) ;
-//
-//                           // Log.d("out_image", "" + attendanceBean.OUT_IMAGE  );
-//
-//                            updateLocally();
-//
-//
-//                            File file = new File( mFile.getPath() );
-//                            if ( file.exists())
-//                            {
-//                                file.delete();
-//                            }
-//
-//
-//
-//                        }
-//
-//
-//                        saveToDB(path);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//            }
-//        }
-//    }
+
 
     public void SyncAttendanceInBackground() {
-
-
         Intent i = new Intent(MarkAttendanceActivity.this, SyncDataService.class);
         startService(i);
-
-
-//
-//        progressDialog = ProgressDialog.show(MarkAttendanceActivity.this, "", "Connecting to internet..");
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                if (CustomUtility.isOnline(MarkAttendanceActivity.this))
-//                {
-//
-//                    Intent i = new Intent(MarkAttendanceActivity.this, SyncDataService.class);
-//                    i.putExtra("sync_data", "sync_mark_attendance");
-//                    startService(i);
-//
-//                      if ((progressDialog != null) && progressDialog.isShowing()) {
-
-//
-//                    Message msg = new Message();
-//                    msg.obj = "Attendance Sync Successfully";
-//                    mHandler.sendMessage(msg);
-//
-//
-//
-//
-//                } else {
-//                      if ((progressDialog != null) && progressDialog.isShowing()) {
-
-//                    Message msg = new Message();
-//                    msg.obj = "No internet Connection . Attendance saved in offline";
-//                    mHandler.sendMessage(msg);
-//
-//                }
-//
-//            }
-//        }).start();
-
-
     }
 
     void updateLocally() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(mContext);
 
-        // Log.d("mark_person1",""+ LoginBean.getUseid());
-
         attendanceBean.PERNR = LoginBean.getUseid();
         attendanceBean.BEGDA = customutility.getCurrentDate();
         attendanceBean.SERVER_DATE_OUT = customutility.getCurrentDate();
         attendanceBean.SERVER_TIME_OUT = customutility.getCurrentTime();
-        //String latlong[] = latLong.split(",");
-
-        //attendanceBean.OUT_ADDRESS = getCompleteAddressString(Double.parseDouble(latlong[0]), Double.parseDouble(latlong[1]));
         attendanceBean.OUT_ADDRESS = "";
 
-
         attendanceBean.OUT_TIME = customutility.getCurrentTime();
-       /* long attendanceDifference = System.currentTimeMillis() - attendanceBean.CURRENT_MILLIS;
-        long second = (attendanceDifference / 1000) % 60;
-        long minute = (attendanceDifference / (1000 * 60)) % 60;
-        long hour = (attendanceDifference / (1000 * 60 * 60)) % 24;
-        String time = String.format(Locale.US,"%02d:%02d:%02d", hour, minute, second);
-        attendanceBean.WORKING_HOURS = time;*/
         attendanceBean.IMAGE_DATA = "";
         attendanceBean.OUT_LAT_LONG = latLong;
-        // attendanceBean.OUT_FILE_NAME = mFile.getName();
-        // attendanceBean.OUT_FILE_VALUE = mFile.getPath();
 
 
         dataHelper.updateMarkAttendance(attendanceBean);
         SyncAttendanceInBackground();
         //Out Attendance
         new Capture_employee_gps_location(this, "3", "");
-
-        //   MainActivity.mainActivity.mydb.updateAttendance(attendanceBean);
-
         Toast.makeText(mContext, "Out Attendance Marked", Toast.LENGTH_LONG).show();
 
     }
 
-    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
-        String strAdd = "";
-        Geocoder geocoder = new Geocoder(this, Locale.US);
-        try {
-            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
-            if (addresses != null) {
-                Address returnedAddress = addresses.get(0);
-                StringBuilder strReturnedAddress = new StringBuilder("");
 
-                for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
-                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-                }
-                strAdd = strReturnedAddress.toString();
-                //   Log.w("My Current loction address", "" + strReturnedAddress.toString());
-            } else {
-                //     Log.w("My Current loction address", "No Address returned!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            //    Log.w("My Current loction address", "Canont get Address!");
-        }
-        return strAdd;
-    }
-
-    void saveToDB(String file) {
-        refereshView(file);
-    }
-
-    void refereshView(String file) {
-        try {
-            if (!TextUtils.isEmpty(file)) {
-                //   ImageLoaderUniversal.ImageLoadSquare(mContext,fileInitial+file, mViewHolder.image, ImageLoaderUniversal.option_normal_Image.get());
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /***************************** new camera code *****************************************/
+     /***************************** new camera code *****************************************/
 
     public void openCamera() {
 
-
         if (CameraUtils.checkPermissions(mContext)) {
-
-            /*
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-
-        File file = CameraUtils.getOutputMediaFile(MEDIA_TYPE_IMAGE);
-
-        if (file != null) {
-            imageStoragePath = file.getAbsolutePath();
-        }
-
-        fileUri = CameraUtils.getOutputMediaFileUri(getApplicationContext(), file);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-        // start the image capture Intent
-        startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
-*/
-
-
             camraLauncher.launch(new Intent(MarkAttendanceActivity.this, CameraActivity.class)
                     .putExtra("cust_name", LoginBean.getUsername())
                     .putExtra("FrontCamera","1"));
@@ -693,73 +421,9 @@ public class MarkAttendanceActivity extends AppCompatActivity {
             });
 
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // save file url in bundle as it will be null on screen orientation
-        // changes
-        outState.putParcelable("file_uri", fileUri);
-    }
-
-    /*****************************  end camera code *****************************************/
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        // get the file url
-        fileUri = savedInstanceState.getParcelable("file_uri");
-    }
-
-    /********************* add new camera code **********************/
-
-   /* @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // if the result is capturing Image
-        if (resultCode == RESULT_OK) {
-
-           Bitmap bitmap = CameraUtils.optimizeBitmap(BITMAP_SAMPLE_SIZE, imageStoragePath);
-
-            ByteArrayOutputStream byteArrayBitmapStream = new ByteArrayOutputStream();
-
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayBitmapStream);
-
-            byte[] byteArray = byteArrayBitmapStream.toByteArray();
-
-            if (requestCode == 100)   // 100 =  in attendance
-            {
-
-                attendanceBean.IN_IMAGE = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                saveLocally();
-
-                deleteDirectory(new File(Objects.requireNonNull(fileUri.getPath())));
-            }
-
-
-            if (requestCode == 200)   // 200 =  out attendance
-            {
-                attendanceBean.OUT_IMAGE = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                updateLocally();
-
-                deleteDirectory(new File(Objects.requireNonNull(fileUri.getPath())));
-            }
-
-            MarkAttendanceActivity.this.finish();
-        }
-
-    }*/
-
-    /********************* end new camera code **********************/
 
     public void getAttendnace() {
-
         attendanceBean = db.getMarkAttendanceByDate(customutility.getCurrentDate(),Userid);
-
-
     }
 
     private boolean deleteDirectory(File path) {

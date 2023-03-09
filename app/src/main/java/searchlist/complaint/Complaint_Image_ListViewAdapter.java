@@ -50,7 +50,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import activity.CameraActivity;
 import activity.CustomUtility;
+import activity.OtherImgActivity;
 import activity.complaint.DisplayComplaintImageActivity;
 import bean.ComplaintImage;
 import database.DatabaseHelper;
@@ -79,7 +81,7 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
     Intent data;
     String flag = "null";
     int PERMISSION_ALL = 1;
-    String videodata;
+
 
     String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -104,10 +106,8 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
         inflater = LayoutInflater.from(mContext);
         this.arraylist = new ArrayList<Complaint_Image_Name>();
         this.arraylist.addAll(complaintSearchlist);
-
         this.arraylist_ImageTaken = new ArrayList<ComplaintImage>();
         this.arraylist_ImageTaken.addAll(list_complaintImageTaken);
-        File file = CameraUtils.getOutputMediaFile1(MEDIA_TYPE_IMAGE,"ShaktiPump", "ImagePumpShakti" +System.currentTimeMillis());
 
     }
 
@@ -160,28 +160,19 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
-        if (view == null) {
+
             holder = new ViewHolder();
             view = inflater.inflate(R.layout.search_listview_complaint_image, null);
             holder.image_name = (TextView) view.findViewById(R.id.image_name);
             holder.complete_icon = (TextView) view.findViewById(R.id.complete_icon);
             view.setTag(holder);
-        } else {
-            holder = (ViewHolder) view.getTag();
-        }
+
 
         holder.image_name.setText(complaintSearchlist.get(position).getName());
         image_item = "101" + complaintSearchlist.get(position).getItem();
 
         for (int i = 0; i < arraylist_ImageTaken.size(); i++) {
-            // image_item = arraylist_ImageTaken.get(i).getPosnr() ;
-            Log.e("CAtegory", "&&&&&&" + cmp_cat);
-            Log.e("SIZE", "&&&&&&" + arraylist_ImageTaken.size());
-            Log.e("CMPNO", "&&&&&&" + cmp_no);
-            Log.e("AUDIORECORD", "&&&&&&" + audio_record);
-            Log.e("IMAGE_ITEM", "&&&&&&" + image_item);
-            Log.e("IMAGE_ITEM12", "&&&&&&" + arraylist_ImageTaken.get(i).getPosnr());
-            if (arraylist_ImageTaken.get(i).getPosnr().equalsIgnoreCase(image_item)) {
+              if (arraylist_ImageTaken.get(i).getPosnr().equalsIgnoreCase(image_item)) {
                 holder.complete_icon.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.mipmap.done, 0);
             }
         }
@@ -192,19 +183,15 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
                 image_item = "101" + complaintSearchlist.get(position).getItem();
                 image_name = complaintSearchlist.get(position).getName();
                 cmp_cat = complaintSearchlist.get(position).getCategory();
-                Log.e("IMAGEITEM", "&&&&" + image_item);
-                Log.e("IMAGENAME", "&&&&" + image_name);
-                for (int i = 0; i < arraylist_ImageTaken.size(); i++) {
+                 for (int i = 0; i < arraylist_ImageTaken.size(); i++) {
                     flag = "null";
                     if (arraylist_ImageTaken.get(i).getPosnr().equalsIgnoreCase(image_item)) {
                         flag = "X";
                         break;
                     }
                 }
-                Log.d("flag", flag);
-                if (flag.equalsIgnoreCase("X")) {
+                 if (flag.equalsIgnoreCase("X")) {
                     Intent intent = new Intent(mContext, DisplayComplaintImageActivity.class);
-                    //Log.d("cmp_category1",cmp_no+"--"+cmp_category);
                     intent.putExtra("cmp_no", cmp_no);
                     intent.putExtra("cmp_posnr", image_item);
                     intent.putExtra("cmp_category", cmp_cat);
@@ -218,18 +205,9 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
                     } else {
                         image_name = complaintSearchlist.get(position).getName();
                         image_item = "101" + complaintSearchlist.get(position).getItem();
-                        // showFileChooser();
-                        if (ActivityCompat.checkSelfPermission(mContext, READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                            if (Build.VERSION.SDK_INT <= 19) {
-
-                                showConfirmationCamera(image_name);
-
-                            } else {
-
-                                showConfirmationCamera(image_name);
-                            }
-//                            selectPdf();
-                        } else {
+                         if (ActivityCompat.checkSelfPermission(mContext, READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                             showConfirmationCamera(image_name);
+                         } else {
                             if (!hasPermissions(mContext, PERMISSIONS)) {
                                 ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS, PERMISSION_ALL);
                             }
@@ -242,13 +220,6 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
         return view;
     }
 
-    // Intent for navigating to the files
-    private void selectPdf() {
-        Intent pdfIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        pdfIntent.setType("application/pdf");
-        pdfIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        ((Activity) mContext).startActivityForResult(pdfIntent, GALLERY_PDF_REQUEST_CODE);
-    }
 
     //start of new code for live photo 07-02-2023
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
@@ -291,6 +262,7 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
             ((Activity) mContext).startActivityForResult(intent, CAMERA_IMAGE_REQUEST_CODE);
+
         }
     }
 
@@ -472,209 +444,6 @@ public class Complaint_Image_ListViewAdapter extends BaseAdapter{
             }
         }
         return audio_record;
-    }
-
-    private class CompressVideo extends AsyncTask<String, String, String> {
-
-        // Initialize dialog
-        Dialog dialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Display dialog
-            Dialog dialog = ProgressDialog.show( mContext, "", "Compressing...");
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            // Initialize video path
-            String videoPath = null;
-
-            try {
-                // Initialize uri
-                Uri uri = Uri.parse(strings[1]);
-                // Compress video
-                videoPath = SiliCompressor.with(mContext).compressVideo(uri, strings[2]);
-
-                FileInputStream objFileIS = null;
-                try {
-                    System.out.println("file = >>>> <<<<<" + videoPath);
-                    objFileIS = new FileInputStream(videoPath);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                ByteArrayOutputStream objByteArrayOS = new ByteArrayOutputStream();
-                byte[] byteBufferString = new byte[1024];
-                try {
-                    for (int readNum; (readNum = objFileIS.read(byteBufferString)) != -1; ) {
-                        objByteArrayOS.write(byteBufferString, 0, readNum);
-                        System.out.println("read " + readNum + " bytes,");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                byte[] mByte = objByteArrayOS.toByteArray();
-
-                //  String  videodata = Base64.encodeToString(mByte, Base64.DEFAULT);
-                videodata = Base64.encodeToString(mByte, Base64.DEFAULT);
-                System.out.println("videodata=vk=>" + videodata);
-
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-            // Return Video path
-            return videoPath;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            // Dismiss dialog
-            dialog.dismiss();
-
-            // Visible all views
-           /* videoView1.setVisibility(View.VISIBLE);
-            textView1.setVisibility(View.VISIBLE);
-            videoView2.setVisibility(View.VISIBLE);
-            textView2.setVisibility(View.VISIBLE);
-            textView3.setVisibility(View.VISIBLE);
-*/
-            // Initialize file
-            File file = new File(s);
-            // Initialize uri
-          /*  Uri uri = Uri.fromFile(file);
-            // set video uri
-            videoView2.setVideoURI(uri);
-
-            // start both video
-            videoView1.start();
-            videoView2.start();*/
-
-            // Compress video size
-            float size = file.length() / 1024f;
-
-            System.out.println("Video_SIze==>>" + String.format("Size : %.2f KB", size));
-            // Set size on text view
-
-        }
-    }
-
-    public static byte[] convertVideoToBytes(Context context, Uri uri) {
-        byte[] videoBytes = null;
-        try {//  w  w w  . j ava 2s . c  o m
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            FileInputStream fis = new FileInputStream(new File(String.valueOf(uri)));
-            byte[] buf = new byte[1024];
-            int n;
-            while (-1 != (n = fis.read(buf)))
-                baos.write(buf, 0, n);
-
-            videoBytes = baos.toByteArray();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return videoBytes;
-    }
-
-    public static String getRealVideoPathFromURI(ContentResolver contentResolver, Uri contentURI) {
-        Cursor cursor = contentResolver.query(contentURI, null, null, null, null);
-        if (cursor == null)
-            return contentURI.getPath();
-        else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
-            try {
-                return cursor.getString(idx);
-            } catch (Exception exception) {
-                return null;
-            }
-        }
-    }
-
-    // UPDATED!
-    public String getPath(Uri uri) {
-        String[] projection = {MediaStore.Video.Media.DATA};
-        Cursor cursor = mContext.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-            // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-            int column_index = cursor
-                    .getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } else
-            return null;
-    }
-
-    public String getStringPdf(Uri filepath) {
-        InputStream inputStream = null;
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            inputStream = mContext.getContentResolver().openInputStream(filepath);
-            byte[] buffer = new byte[6144];
-            byteArrayOutputStream = new ByteArrayOutputStream();
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        byte[] pdfByteArray = byteArrayOutputStream.toByteArray();
-        System.out.println("Final_REsult==>>" + Base64.encodeToString(pdfByteArray, Base64.DEFAULT));
-        return Base64.encodeToString(pdfByteArray, Base64.DEFAULT);
-    }
-
-    public String getImagePath(Uri uri) {
-        String s = null;
-        File file = new File(uri.getPath());
-        String[] filePath = file.getPath().split(":");
-        String image_id = filePath[filePath.length - 1];
-        if (uri == null) {
-            // TODO perform some logging or show user feedback
-            return null;
-        } else {
-            String[] projection = {String.valueOf(MediaStore.Images.Media.DATA)};
-            Cursor cursor1 = ((Activity) mContext).getContentResolver().query(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, MediaStore.Images.Media._ID + " = ? ", new String[]{image_id}, null);
-            Cursor cursor2 = ((Activity) mContext).getContentResolver().query(uri, projection, null, null, null);
-            Log.e("CUR1", "&&&&" + cursor1);
-            Log.e("CUR2", "&&&&" + cursor2);
-            if (cursor1 == null && cursor2 == null) {
-                return null;
-            } else {
-                int column_index = 0;
-                if (cursor1 != null) {
-                    column_index = cursor1.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor1.moveToFirst();
-                    if (cursor1.moveToFirst()) {
-                        s = cursor1.getString(column_index);
-                    }
-                    cursor1.close();
-                }
-                int column_index1 = 0;
-                if (cursor2 != null) {
-                    column_index1 = cursor2.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor2.moveToFirst();
-                    if (cursor2.moveToFirst()) {
-                        s = cursor2.getString(column_index1);
-                    }
-                    cursor2.close();
-                }
-                return s;
-            }
-        }
     }
 
     public class ViewHolder {
