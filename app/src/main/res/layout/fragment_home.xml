@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_header_color"
+    android:orientation="vertical"
+    android:weightSum="1"
+    tools:context="activity.HomeFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fillViewport="false"
+        android:focusable="false"
+        android:longClickable="false"
+        android:measureAllChildren="false"
+        android:nestedScrollingEnabled="false"
+        android:saveEnabled="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_attendance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="false"
+                    android:background="@layout/rounded_corner"
+                    android:baselineAlignBottom="false"
+                    android:clickable="false"
+                    android:drawableTop="@mipmap/attendnace"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Attendance"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+
+                    android:layout_weight=".12"
+                    android:orientation="vertical"/>
+
+                <Button
+                    android:id="@+id/btn_route"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="false"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@mipmap/route"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Route"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/adhoc_order"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@layout/rounded_corner"
+                        android:drawableTop="@mipmap/order"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp"
+                        android:text="Adhoc Order"
+
+                        android:textAlignment="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textColor="@color/dark_header_color"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".002"
+                    android:orientation="vertical"></LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+
+                    <RelativeLayout
+                        android:id="@+id/unsync"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+
+                        android:layout_marginLeft="3dp">
+
+
+                        <TextView
+                            android:id="@+id/unsync_data"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_gravity="right|center"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginLeft="0dp"
+
+                            android:layout_marginEnd="0dp"
+                            android:layout_marginRight="0dp"
+                            android:layout_weight="1"
+                            android:background="@layout/rounded_corner"
+                            android:drawableTop="@mipmap/unsync"
+                            android:paddingTop="15dp"
+                            android:paddingBottom="15dp"
+                            android:text="Unsync Data"
+                            android:textAlignment="center"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textColor="@color/dark_header_color"
+                            android:textSize="13dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_notification"
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="30dp"
+                            android:textColor="#FFDC0707"
+                            android:textSize="13dp"
+                            android:textStyle="bold" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/complaint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+
+                    android:drawableTop="@mipmap/complaint"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Complaint"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".12"
+                    android:orientation="vertical" />
+
+                <Button
+                    android:id="@+id/btn_target"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@mipmap/target"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Target"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/local_conv_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="3dp"
+                    android:background="@drawable/top_left_right_rounded"
+                    android:gravity="center"
+                    android:padding="@dimen/space_mid6"
+                    android:text="Local Conveyance"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+
+                    android:drawableTop="@drawable/play"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Start Travel"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".5"
+                    android:orientation="vertical" />
+
+                <Button
+                    android:id="@+id/end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/pause"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="End Travel"
+                    android:textAlignment="center"
+
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".5"
+                    android:orientation="vertical" />
+
+                <Button
+                    android:id="@+id/offlinedata"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/offline"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Offline Data"
+                    android:textAlignment="center"
+
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/dsr_entry"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@mipmap/dsr"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="DSR Entry"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".12"
+                    android:orientation="vertical"/>
+
+                <Button
+                    android:id="@+id/report"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@mipmap/report"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Dashboard"
+                    android:textAlignment="center"
+
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/goods_recp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/ic_baseline_receipt_24"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Goods Receipt"
+                    android:textAlignment="center"
+
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="match_parent"
+                    android:layout_weight=".12"
+                    android:orientation="vertical"/>
+
+                <Button
+                    android:id="@+id/goods_iss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/godsissue"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="Goods Issues"
+                    android:visibility="invisible"
+                    android:textAlignment="center"
+
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginRight="35dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/goods_trans_det"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/truck"
+                    android:paddingTop="15dp"
+                    android:visibility="gone"
+                    android:paddingBottom="15dp"
+                    android:ems="10"
+                    android:text="@string/trans_det"
+                    android:inputType="textMultiLine"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".12"
+                    android:orientation="vertical"/>
+
+                <Button
+                    android:id="@+id/stck_det_rep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:background="@layout/rounded_corner"
+                    android:drawableTop="@drawable/stkdet"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/stock_det"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/dark_header_color"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>

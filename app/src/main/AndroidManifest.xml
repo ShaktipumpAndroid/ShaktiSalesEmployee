@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.shaktipumps.shakti.shaktisalesemployee">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACROSS_USERS_FULL" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.ACCESS_GPS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.STORAGE" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" /> <!-- Google Cloud Messaging for Android -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <application
+        android:name="adapter.Controller"
+        android:allowBackup="true"
+        android:appComponentFactory="whateverString"
+        android:configChanges="orientation"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/sales_employee"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
+        android:theme="@style/MyMaterialTheme"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
+        tools:replace="android:appComponentFactory"
+        tools:targetApi="q">
+        <!-- android:theme="@style/AppTheme" -->
+
+        <activity android:name="activity.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="activity.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.MainActivity1"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name="activity.UpdateActivity"
+            android:screenOrientation="portrait" />
+
+            <!-- android:theme="@android:style/Theme.Translucent" -->
+        <activity
+            android:name="activity.RouteActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.SalesTargetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.DsrEntryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.FileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.ReportActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.ShowDocument"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.OtherImgActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.CameraActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.ShowDocument1"
+            android:screenOrientation="portrait" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity
+            android:name="activity.Route_customer_Activity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.IssueMaterialListComplaintActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.IssueMaterialComplaintActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.MapsActivity"
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="searchlist.Search_customer_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="searchlist.SingleItemView"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.Route_customer_work_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.AddNewCustomerActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.ReviewCmpImageListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.MarkAttendanceActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.MarkAttendanceImage"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.AndroidCameraExample"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.AdhocCustomerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.TakeOrderActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name="customlist.OrderConfirmListview"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.ComplaintReviewFilter"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name="activity.DisplayReviewComplaintDetailActivity"
+            android:screenOrientation="portrait" />
+
+       <!-- <service
+            android:name="backgroundservice.TimeService"
+            android:screenOrientation="portrait" />-->
+        <service
+            android:name="activity.LocationUpdatesService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location" />
+
+        <service
+            android:name="activity.NewLocationUpdatesService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location" />
+       <!-- <service
+            android:name="backgroundservice.AndroidService"
+            android:screenOrientation="portrait" />-->
+<!--        <service
+            android:name="backgroundservice.AndroidService"
+            android:enabled="true"
+            android:exported="true"
+
+            android:screenOrientation="portrait" />-->
+        <service
+            android:name="backgroundservice.SyncDataService"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.NoOrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.AttendanceReportActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.AdhocOrderActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name="activity.VisitHistoryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.OrderHistoryActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.ServiceCenterTrainingImgActivity"
+            android:screenOrientation="portrait" />
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name="activity.SurveyActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.OfflineDataConveyance"
+            android:screenOrientation="portrait"
+            android:label="Offline Data"
+            />
+        <activity
+            android:name="activity.ForgotPasswordActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name="activity.CheckOutActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.RoutePlanSearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.RoutePlanDetailActivity"
+            android:screenOrientation="portrait" />
+        <!--<activity
+            android:name="activity.Notification"
+            android:screenOrientation="portrait" />-->
+        <activity
+            android:name="activity.AddNewCustomer_Export_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.PortalDashboardActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.MaterialAnalysisActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.DisplayStockActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.UnsyncdataApplication"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.VideoSearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.TargetActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.MarketDevlopmentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.GoodsReceipt_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.GoodsIssue_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.GoodsIssue_Activity1"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.GoodsTransDet_Activity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.GoodsTransSub_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.StockDetailRep_Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ComplaintDashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ComplaintSearchActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.DealerPendCompActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ComplaintDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.InprocessComplaintActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.PendingComplaintActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ClosureComplaintActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ComplaintActionDisplayActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.DisplayComplaintDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ClosedComplaintActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ServiceCenterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.PendingForApprovalActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.AwaitingForApprovalActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.NewServiceCenterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.PendAwtComplaintDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.ComplaintAttachmentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ShowDocument1"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.ComplaintFrwdAprActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.ApprovedCompActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.SurveyDisplayActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.MouActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.DeviceStatusActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.SerailNoHistoryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.ShowDocument2"
+            android:screenOrientation="portrait" />
+
+
+        <!--&lt;!&ndash; Declare  Alarm Broadcast receiver here &ndash;&gt;-->
+        <receiver
+            android:name="receiver.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="activity.complaint.ComplaintImageActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.DisplayComplaintImageActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.ComplaintForwardActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.PendingComplainDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.VKPendingForApprovalActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.VKPendingForApprovalFinalActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.PendingComplainRemarkListActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="activity.complaint.PendingComplainPhotoGridActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="activity.complaint.PhotoViewerActivity"
+            android:screenOrientation="portrait" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.shaktipumps.shakti.shaktisalesemployee.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                 />
+        </provider>
+
+
+    </application>
+
+</manifest>

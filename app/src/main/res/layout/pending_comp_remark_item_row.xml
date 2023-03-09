@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_3sdp"
+    android:padding="@dimen/_5sdp"
+    android:background="@drawable/bg_shape_item"
+
+    >
+
+    <androidx.cardview.widget.CardView
+
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/white"
+        card_view:cardElevation="4dp"
+        card_view:cardCornerRadius="@dimen/_4sdp">
+
+
+<RelativeLayout
+
+                android:background="@drawable/text_shape_bg"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:layout_marginEnd="@dimen/_4sdp"
+                android:layout_marginStart="@dimen/_4sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+           >
+
+            <RelativeLayout
+                android:background="@drawable/text_shape_bg"
+                android:layout_marginTop="@dimen/_1sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+
+
+                    android:id="@+id/txtRemarkComplainnoHdadID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Comp. no.: "
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="@color/black"
+                    />
+
+                <TextView
+
+
+                    android:layout_marginStart="@dimen/_3sdp"
+                    android:layout_toEndOf="@+id/txtRemarkComplainnoHdadID"
+                    android:id="@+id/txtRemarkComplainnoValueID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="805857434872 "
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold"
+                    android:textColor="@color/blue_fb"
+                    android:background="@android:color/transparent"
+                    />
+
+
+                <TextView
+                    android:layout_toStartOf="@+id/txtRemarkDateValueID"
+
+                    android:id="@+id/txtRemarkDateHeadID"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date: "
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="@color/black"
+                    />
+
+                <TextView
+                    android:layout_alignParentEnd="true"
+
+                    android:id="@+id/txtRemarkDateValueID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="19.12.2014 "
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="@color/blue_fb"
+                    android:background="@android:color/transparent"
+                    />
+
+
+
+
+            </RelativeLayout>
+
+            <!--1-->
+            <RelativeLayout
+                android:background="@drawable/text_shape_bg"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+
+                    android:id="@+id/txtRemarkEnameHdadID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Name:         "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp" />
+
+                <TextView
+android:singleLine="true"
+                    android:layout_marginStart="@dimen/_3sdp"
+                    android:layout_toEndOf="@+id/txtRemarkEnameHdadID"
+                    android:id="@+id/txtRemarkEnameValueID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="9500001082"
+
+                    android:textSize="@dimen/_12ssp"
+                    android:textColor="@color/blue_fb"
+                    android:textStyle="bold"
+                    android:background="@android:color/transparent"
+                    />
+
+               <!-- <TextView
+                    android:layout_toStartOf="@+id/txtComplainDateValueID"
+
+                    android:id="@+id/txtComplainDateHeadID"
+                    android:fontFamily="@font/open_sans_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Comp. Date: "
+                    android:textSize="@dimen/_10ssp"
+                    android:textColor="@color/black"
+                    />
+
+                <TextView
+                    android:layout_alignParentEnd="true"
+
+                    android:id="@+id/txtComplainDateValueID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="19.12.2014 "
+                    android:fontFamily="@font/open_sans_bold"
+                    android:textSize="@dimen/_10ssp"
+                    android:textColor="@color/black"
+                    android:background="@android:color/transparent"
+                    />-->
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:background="@drawable/text_shape_bg"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+
+                    android:id="@+id/txtRemarkActionHdadID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Remark:      "
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_12ssp" />
+
+                <TextView
+
+                    android:id="@+id/txtRemarkActionValueID"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_3sdp"
+                    android:layout_toEndOf="@+id/txtRemarkActionHdadID"
+                    android:background="@android:color/transparent"
+
+                    android:text="9500001082"
+                    android:textColor="@color/blue_fb"
+                    android:textSize="@dimen/_12ssp"
+                    android:textStyle="bold" />
+
+                <!-- <TextView
+                     android:layout_toStartOf="@+id/txtComplainDateValueID"
+
+                     android:id="@+id/txtComplainDateHeadID"
+                     android:fontFamily="@font/open_sans_regular"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Comp. Date: "
+                     android:textSize="@dimen/_10ssp"
+                     android:textColor="@color/black"
+                     />
+
+                 <TextView
+                     android:layout_alignParentEnd="true"
+
+                     android:id="@+id/txtComplainDateValueID"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="19.12.2014 "
+                     android:fontFamily="@font/open_sans_bold"
+                     android:textSize="@dimen/_10ssp"
+                     android:textColor="@color/black"
+                     android:background="@android:color/transparent"
+                     />-->
+            </RelativeLayout>
+
+<!--2-->
+
+
+            <!--3-->
+
+
+
+
+
+        </LinearLayout><!--hhhhhhhhhhhhhhhh ggggg-->
+
+
+
+
+</RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</RelativeLayout>
