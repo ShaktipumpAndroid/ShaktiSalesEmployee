@@ -49,7 +49,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     private static final String GALLERY_DIRECTORY_NAME_COMMON = "SurfaceCamera";
     private SurfaceHolder surfaceHolder;
     private android.hardware.Camera camera;
-    private boolean safeToTakePicture = false;
+
 
     public static final int REQUEST_CODE = 100;
     private final static int RESULT_CODE = 100;
@@ -84,7 +84,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
     public void onBackPressed() {
 
         if(save != null) {
-            Intent intent = new Intent();
+            Intent intent = getIntent();
             intent.putExtra("data",save);
             setResult(RESULT_OK, intent);
             finish();
@@ -160,6 +160,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         setViewVisibility(R.id.surfaceView, View.VISIBLE);
         setViewVisibility(R.id.layoutPreview,View.VISIBLE);
 
+
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         setBtnClick();
@@ -195,7 +196,8 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
         try {
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
-            safeToTakePicture = true;
+            findViewById(R.id.layoutPreview).bringToFront();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

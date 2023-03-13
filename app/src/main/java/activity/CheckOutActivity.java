@@ -630,28 +630,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
         if(index1 != 906 && index1 != 505 && index1 != 427 && index1 != 503 && index1 != 524 && index1 != 536 && index1 != 501 && index1 != 502 && index1 != 606 && index1 != 930 && index1 != 929 ) {
 
-          /*  dataHelper.updateCheckInOut(pref.getString("key_username", "userid"), //userid,
-                            new CustomUtility().getCurrentDate(),
-                            new CustomUtility().getCurrentTime(),
-                            Double.toString(latitude),
-                            Double.toString(longitude),
-                            phone_number,
-                            editText_comment.getText().toString(),
-                            help_name,
-                            audio_record,
-                            customer_name,
-                            city_name,
-                            editText_follow_up_date.getText().toString(), //follow_up_date
-                            conversion_status,
-                            CustomUtility.getBase64FromBitmap(CheckOutActivity.this,photo1),
-                            CustomUtility.getBase64FromBitmap(CheckOutActivity.this,photo2),
-                            CustomUtility.getBase64FromBitmap(CheckOutActivity.this,photo3),
-                            photo4,
-                            photo5,
-                            photo6,
-                            photo7
-                    );*/
-
           dataHelper.insertCheckInOut(userid,
                     new CustomUtility().getCurrentDate(), // check in date
                     new CustomUtility().getCurrentTime(),

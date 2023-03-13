@@ -1,9 +1,12 @@
 package activity;
 
+import static com.google.android.play.core.appupdate.AppUpdateManagerFactory.*;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,8 +15,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.shaktipumps.shakti.shaktisalesemployee.BuildConfig;
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
@@ -39,6 +50,8 @@ public class SplashActivity extends AppCompatActivity {
     Context mContex;
     String versionName = "0.0";
     String newVersion = "0.0";
+    public static int UPDATE_CODE= 100;
+    AppUpdateManager appUpdateManager;
 
     @Override
     // ** Called when the activity is first created. */
@@ -48,6 +61,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         mContex = this;
+
+
         // ******* Create SharedPreferences *******/
 
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
@@ -65,32 +80,122 @@ public class SplashActivity extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().build();
             StrictMode.setThreadPolicy(policy);
 
-            if (Float.parseFloat(newVersion) > Float.parseFloat(versionName)) {
+//            if (Float.parseFloat(newVersion) > Float.parseFloat(versionName)) {
+//
+//                SplashActivity.this.finish();
+//                Intent i = new Intent(SplashActivity.this, UpdateActivity.class);
+//                startActivity(i);
+//
+//            } else
+//            {
+//
+//                if (pref.getString("key_login", "login").equalsIgnoreCase("Y")) {
+//
+//                    LoginBean lb = new LoginBean();
+//                    LoginBean.setLogin(pref.getString("key_username", "userid"), pref.getString("key_ename", "username"));
+//
+//                    i = new Intent(SplashActivity.this, MainActivity1.class);
+//                } else {
+//                    i = new Intent(SplashActivity.this, LoginActivity.class);
+//                }
+//
+//                startActivity(i);
+//                SplashActivity.this.finish();
+//
+//            }
 
-                SplashActivity.this.finish();
-                Intent i = new Intent(SplashActivity.this, UpdateActivity.class);
-                startActivity(i);
+            if (pref.getString("key_login", "login").equalsIgnoreCase("Y")) {
 
+                LoginBean lb = new LoginBean();
+                LoginBean.setLogin(pref.getString("key_username", "userid"), pref.getString("key_ename", "username"));
+                i = new Intent(SplashActivity.this, MainActivity1.class);
             } else {
-
-                if (pref.getString("key_login", "login").equalsIgnoreCase("Y")) {
-
-                    LoginBean lb = new LoginBean();
-                    LoginBean.setLogin(pref.getString("key_username", "userid"), pref.getString("key_ename", "username"));
-
-                    i = new Intent(SplashActivity.this, MainActivity1.class);
-                } else {
-                    i = new Intent(SplashActivity.this, LoginActivity.class);
-                }
-
-                startActivity(i);
-                SplashActivity.this.finish();
-
+                i = new Intent(SplashActivity.this, LoginActivity.class);
             }
-        }, SPLASH_TIME_OUT);
+
+            startActivity(i);
+            SplashActivity.this.finish();
+
+            }, SPLASH_TIME_OUT);
+
+        checkforUpdate();
     }
 
 
+        public void checkforUpdate(){
+
+            appUpdateManager = create(this);
+            appUpdateManager.getAppUpdateInfo().addOnSuccessListener(
+                    appUpdateInfo -> {
+
+                        if ((appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE)
+                                && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE))
+                        {
+
+                            try {
+                                appUpdateManager.startUpdateFlowForResult(
+                                        appUpdateInfo,  AppUpdateType.IMMEDIATE, this,UPDATE_CODE);
+                            } catch (IntentSender.SendIntentException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+            appUpdateManager.registerListener(listener);
+        }
+
+    InstallStateUpdatedListener listener = installState -> {
+
+        if (installState.installStatus() == InstallStatus.DOWNLOADED ){
+            popUp();
+        }
+    };
+
+
+
+    private void popUp() {
+
+        Snackbar snackbar = Snackbar.make(
+                findViewById(android.R.id.content),"App Update almost Done.", Snackbar.LENGTH_INDEFINITE);
+
+        snackbar.setAction("Reload", view -> appUpdateManager.completeUpdate());
+
+        snackbar.setTextColor(Color.BLUE);
+        snackbar.show();
+    }
+
+    @Override
+    protected void onResume() {
+
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(
+                appUpdateInfo -> {
+
+                    if ((appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS ))
+                    {
+
+                        try {
+                            appUpdateManager.startUpdateFlowForResult(
+                                    appUpdateInfo,  AppUpdateType.IMMEDIATE, this,UPDATE_CODE);
+                        } catch (IntentSender.SendIntentException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+        super.onResume();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == UPDATE_CODE && resultCode != RESULT_OK)
+        {
+            Toast.makeText(this, "Cancle", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
     public static void deleteCache(Context context) {
         try {

@@ -269,17 +269,6 @@ public class UnsyncdataApplication extends AppCompatActivity {
 
                     UnsyncdataApplication.this.finish();
 
-/*//                    Intent intent = new Intent(UnsyncdataApplication.this,UnsyncdataApplication.class);
-//                    startActivity(intent);
-                    //syncing_data() ;
-
-
-                      if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        };*/
-
-
                 } else {
                       if ((progressDialog != null) && progressDialog.isShowing()) {
                             progressDialog.dismiss();

@@ -125,7 +125,7 @@ public class ComplaintImageActivity extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
         try {
-            audio_record = adapter.onActivityResult(requestCode, resultCode, data, cmp_category, cmp_no);
+            audio_record = adapter.onActivityResult(requestCode, resultCode, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
