@@ -939,7 +939,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_CMPNO + " TEXT,"
             + KEY_POSNR + " TEXT,"
             + KEY_IMAGE + " BLOB,"
-//            + KEY_PDF1 + " TEXT,"
             + KEY_CR_DATE + " TEXT,"
             + KEY_CATEGORY + " TEXT,"
             + KEY_SYNC + " TEXT)";
@@ -3263,9 +3262,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String cmpno,
             String posnr,
             String category,
-            String image
-//            , String pdfData
-    ) {
+            String image) {
         // Open the database for writing
         SQLiteDatabase db = this.getWritableDatabase();
         // Start the transaction.
@@ -3276,7 +3273,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_CMPNO, cmpno);
             values.put(KEY_POSNR, posnr);
             values.put(KEY_IMAGE, image);
-//            values.put(KEY_PDF1, pdfData);
             values.put(KEY_CATEGORY, category);
             values.put(KEY_CR_DATE, new CustomUtility().getCurrentDate());
             values.put(KEY_SYNC, "NOT");
@@ -4163,57 +4159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list_checkInOut;
 
 
-        /*SQLiteDatabase database = this.getReadableDatabase();
-        Cursor cursor = database.rawQuery(" SELECT * FROM " + TABLE_CHECK_IN_OUT, null);
-
-        list_checkInOut.clear();
-        CheckInOutBean checkInOut;
-
-        if (cursor.getCount() > 0) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToNext();
-
-                 checkInOut = new CheckInOutBean();
-                checkInOut.setKey_id(cursor.getString(0));
-                checkInOut.setPernr(cursor.getString(1));
-                checkInOut.setDate_in(cursor.getString(2));
-                checkInOut.setTime_in(cursor.getString(3));
-                checkInOut.setDate_out(cursor.getString(4));
-                checkInOut.setTime_out(cursor.getString(5));
-                checkInOut.setCheck_in_latitude(cursor.getString(6));
-                checkInOut.setCheck_out_latitude(cursor.getString(7));
-                checkInOut.setCheck_in_longitude(cursor.getString(8));
-                checkInOut.setCheck_out_longitude(cursor.getString(9));
-                checkInOut.setComment(cursor.getString(10));
-                checkInOut.setHelp_name(cursor.getString(11));
-                checkInOut.setRoute_code(cursor.getString(12));
-                checkInOut.setAudio_record(cursor.getString(13));
-                checkInOut.setKeySynk(cursor.getString(14));
-                checkInOut.setCustomer_name(cursor.getString(15));
-                checkInOut.setDistrict(cursor.getString(16));
-                checkInOut.setChatApp(cursor.getString(17));
-                checkInOut.setFollow_up_date(cursor.getString(18));
-                checkInOut.setConversion_status(cursor.getString(19));
-                checkInOut.setPhoto1_text(cursor.getString(20));
-                checkInOut.setPhoto2_text(cursor.getString(21));
-                checkInOut.setPhoto3_text(cursor.getString(22));
-                checkInOut.setPhoto4_text(cursor.getString(23));
-                checkInOut.setPhoto5_text(cursor.getString(24));
-                checkInOut.setPhoto6_text(cursor.getString(25));
-                checkInOut.setPhoto7_text(cursor.getString(26));
-                checkInOut.setPhone_number(cursor.getString(28));
-
-
-
-                checkInOut.setPhone_number(cursor.getString(cursor.getColumnIndex(KEY_PHONE_NUMBER)));
-                list_checkInOut.add(checkInOut);
-            }
-        }
-        cursor.close();
-        database.close();
-
-        return list_checkInOut;*/
-    }
+     }
 
     public int getLatestNewAddedCustomerKeyID() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -4226,48 +4172,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.moveToFirst();
                 maxValue = cursor.getInt(0);
-////                deletedRow = db.delete(TABLE_NEW_ADDED_CUSTOMER, KEY_ID + " = '" + id + "'", null);
-//                selectQuery = "SELECT * FROM " + TABLE_NEW_ADDED_CUSTOMER + " WHERE " + KEY_ID + " = '" + id + "'";
-//                cursor = db.rawQuery(selectQuery, null);
-//                if (cursor.getCount() > 0) {
-//                        newAddedCustoemr.setKey_id(cursor.getString(cursor.getColumnIndex(KEY_ID)));
-//                        newAddedCustoemr.setPernr(cursor.getString(cursor.getColumnIndex(KEY_PERNR)));
-//                        newAddedCustoemr.setBudat(cursor.getString(cursor.getColumnIndex(KEY_BUDAT)));
-//                        newAddedCustoemr.setTime(cursor.getString(cursor.getColumnIndex(KEY_TIME_IN)));
-//                        newAddedCustoemr.setRoute_code(cursor.getString(cursor.getColumnIndex(KEY_ROUTE_CODE)));
-//                        newAddedCustoemr.setRoute_name(cursor.getString(cursor.getColumnIndex(KEY_ROUTE_NAME)));
-//                        newAddedCustoemr.setKunnr(cursor.getString(cursor.getColumnIndex(KEY_KUNNR)));
-//                        newAddedCustoemr.setPartner(cursor.getString(cursor.getColumnIndex(KEY_PARTNER)));
-//                        newAddedCustoemr.setPartner_class(cursor.getString(cursor.getColumnIndex(KEY_PARTNER_CLASS)));
-//                        newAddedCustoemr.setLatitude(cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)));
-//                        newAddedCustoemr.setLongitude(cursor.getString(cursor.getColumnIndex(KEY_LONGITUDE)));
-//                        newAddedCustoemr.setPartner_name(cursor.getString(cursor.getColumnIndex(KEY_PARTNER_NAME)));
-//                        newAddedCustoemr.setLand1(cursor.getString(cursor.getColumnIndex(KEY_LAND1)));
-//                        newAddedCustoemr.setLand_txt(cursor.getString(cursor.getColumnIndex(KEY_LAND_TXT)));
-//                        newAddedCustoemr.setState_code(cursor.getString(cursor.getColumnIndex(KEY_STATE_CODE)));
-//                        newAddedCustoemr.setState_txt(cursor.getString(cursor.getColumnIndex(KEY_STATE_TXT)));
-//                        newAddedCustoemr.setDistrict_code(cursor.getString(cursor.getColumnIndex(KEY_DISTRICT_CODE)));
-//                        newAddedCustoemr.setDistrict_txt(cursor.getString(cursor.getColumnIndex(KEY_DISTRICT_TXT)));
-//                        newAddedCustoemr.setTaluka_code(cursor.getString(cursor.getColumnIndex(KEY_TALUKA_CODE)));
-//                        newAddedCustoemr.setTaluka_txt(cursor.getString(cursor.getColumnIndex(KEY_TALUKA_TXT)));
-//                        newAddedCustoemr.setAddress(cursor.getString(cursor.getColumnIndex(KEY_ADDRESS)));
-//                        newAddedCustoemr.setEmail(cursor.getString(cursor.getColumnIndex(KEY_EMAIL)));
-//                        newAddedCustoemr.setMob_no(cursor.getString(cursor.getColumnIndex(KEY_MOB_NO)));
-//                        newAddedCustoemr.setTel_number(cursor.getString(cursor.getColumnIndex(KEY_TEL_NUMBER)));
-//                        newAddedCustoemr.setPincode(cursor.getString(cursor.getColumnIndex(KEY_PINCODE)));
-//                        newAddedCustoemr.setContact_person(cursor.getString(cursor.getColumnIndex(KEY_CONTACT_PERSON)));
-//                        newAddedCustoemr.setDistributor_code(cursor.getString(cursor.getColumnIndex(KEY_DISTRIBUTOR_CODE)));
-//                        newAddedCustoemr.setDistributor_name(cursor.getString(cursor.getColumnIndex(KEY_DISTRIBUTOR_NAME)));
-//                        newAddedCustoemr.setPhone_number(cursor.getString(cursor.getColumnIndex(KEY_PHONE_NUMBER)));
-//                        newAddedCustoemr.setAadhar_card(cursor.getString(cursor.getColumnIndex(KEY_AADHAR_CARD)));
-//                        newAddedCustoemr.setPan_card(cursor.getString(cursor.getColumnIndex(KEY_PAN_CARD)));
-//                        newAddedCustoemr.setTin_no(cursor.getString(cursor.getColumnIndex(KEY_TIN_NO)));
-//                        newAddedCustoemr.setMarket_place(cursor.getString(cursor.getColumnIndex(KEY_MARKET_PLACE)));
-//                        newAddedCustoemr.setDob(cursor.getString(cursor.getColumnIndex(KEY_DOB)));
-//                        newAddedCustoemr.setIntrested(cursor.getString(cursor.getColumnIndex(KEY_INTRESTED)));
-//                        newAddedCustoemr.setAdded_at_latlong(cursor.getString(cursor.getColumnIndex(KEY_ADDED_AT_LATLONG)));
-//                }
-//                db.setTransactionSuccessful();
+
             }
         } catch (SQLiteException e) {
             e.printStackTrace();
@@ -4607,10 +4512,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     EmployeeGPSActivityBean employeeGPSActivity = new EmployeeGPSActivityBean();
 
-//                    Log.d("gps_count1",""+ cursor.getString(cursor.getColumnIndex(KEY_PERNR)) +
-//                            cursor.getString(cursor.getColumnIndex(KEY_BUDAT)) +
-//                            cursor.getString(cursor.getColumnIndex(KEY_TIME_IN)));
-//
 
                     employeeGPSActivity.setKey_id(cursor.getString(cursor.getColumnIndex(KEY_ID)));
 
@@ -4684,9 +4585,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 while (cursor.moveToNext()) {
 
                     CallLog callLog = new CallLog();
-
-
-//
 
                     callLog.setKey_id(cursor.getString(cursor.getColumnIndex(KEY_ID)));
 
@@ -4903,7 +4801,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = null;
         Cursor cursor = null;
         try {
-            selectQuery = "SELECT * FROM " + TABLE_ZCMPLN_IMAGE + " WHERE " + KEY_SYNC + " = '" + "NOT" + "'";
+            selectQuery = "SELECT * FROM " + TABLE_ZCMPLN_IMAGE;
             cursor = db.rawQuery(selectQuery, null);
 
             if (cursor.getCount() > 0) {
@@ -4915,14 +4813,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     complaintImage.setKey_id(cursor.getString(cursor.getColumnIndex(KEY_ID)));
                     complaintImage.setCmpno(cursor.getString(cursor.getColumnIndex(KEY_CMPNO)));
-                    complaintImage.setCategory(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
                     complaintImage.setPosnr(cursor.getString(cursor.getColumnIndex(KEY_POSNR)));
+                    complaintImage.setCategory(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
                     complaintImage.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
+
 
 
                     list_complaintImage.add(complaintImage);
                 }
-
             }
         } catch (SQLiteException e) {
             e.printStackTrace();
