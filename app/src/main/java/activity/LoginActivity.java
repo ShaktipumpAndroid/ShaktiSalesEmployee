@@ -69,8 +69,8 @@ public class LoginActivity extends AppCompatActivity {
     String[] PERMISSIONS = {
             android.Manifest.permission.READ_CONTACTS,
             android.Manifest.permission.WRITE_CONTACTS,
-         /*   android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,*/
+         android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_PHONE_STATE,
             android.Manifest.permission.CAMERA,
             android.Manifest.permission.RECORD_AUDIO,

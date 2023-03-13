@@ -1,5 +1,6 @@
 package adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -69,7 +70,7 @@ public class PendingComplainDetailsListAdapter extends RecyclerView.Adapter<Pend
         this.mMobileNumber = mMobileNumber;
 
        // mUserID = CustomUtility.getSharedPreferences(mContext,"userID");
-        pref = this.mContext.getSharedPreferences("MyPref", MODE_PRIVATE);
+        pref = this.mContext.getSharedPreferences("MyPref", Context.MODE_PRIVATE);
         editor = pref.edit();
 
         mUserID = pref.getString("key_username", "userid");
@@ -83,7 +84,7 @@ public class PendingComplainDetailsListAdapter extends RecyclerView.Adapter<Pend
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
        holder.txtwarranteeValueID.setText(mComplainDetailListResponse.get(position).getWarrantee());
 

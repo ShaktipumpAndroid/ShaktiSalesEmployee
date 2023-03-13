@@ -5,9 +5,8 @@ package searchlist.complaint;
  */
 public class Complaint_Image_Name {
 
-    String category = "null",
-            item = "null",
-            name = "null";
+    String category, item, name;
+    Boolean ImgSelected;
 
 
     public String getCategory() {
@@ -32,5 +31,13 @@ public class Complaint_Image_Name {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getImgSelected() {
+        return ImgSelected;
+    }
+
+    public void setImgSelected(Boolean imgSelected) {
+        ImgSelected = imgSelected;
     }
 }

@@ -306,6 +306,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="activity.complaint.ComplaintSearchActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize|adjustPan"
             android:screenOrientation="portrait" />
 
         <activity

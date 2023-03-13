@@ -12,12 +12,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -40,17 +36,12 @@ import com.shaktipumps.shakti.shaktisalesemployee.R;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 import backgroundservice.SyncDataService;
 import bean.AttendanceBean;
 import bean.LoginBean;
 import database.DatabaseHelper;
 import other.CameraUtils;
-import webservice.WebURL;
 
 public class MarkAttendanceActivity extends AppCompatActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;

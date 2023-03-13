@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="@dimen/_10sdp">
 
         <TextView
             android:id="@+id/cmpno"
@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:gravity="end|center"
             android:textColor="#0179b6"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -27,7 +28,8 @@
             android:layout_alignParentEnd="true"
             android:gravity="end|center"
             android:textColor="#0179b6"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -36,10 +38,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/cmpno"
             android:layout_gravity="start"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:text="Customer : "
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -48,9 +51,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/cmpno"
             android:layout_gravity="start"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:layout_toRightOf="@+id/customer_name_txt"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
 
@@ -63,8 +67,9 @@
             android:layout_alignParentRight="true"
             android:gravity="right|center"
             android:textColor="#0179b6"
-            android:layout_marginTop="8dp"
-            android:textSize="15sp" />
+            android:layout_marginTop="@dimen/_5sdp"
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/cmppnddy"
@@ -73,9 +78,10 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@+id/epc_txt"
             android:gravity="end|center"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:textColor="#FF0000"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -84,10 +90,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/customer_name"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Mobile    :"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -98,7 +105,8 @@
             android:layout_alignTop="@+id/mobile_no"
             android:layout_gravity="right"
             android:layout_toRightOf="@+id/mobile_txt"
-            android:textSize="1dp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/mobile_no"
@@ -106,9 +114,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/customer_name"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/mobile_image"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -117,10 +126,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/mobile_no"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Alternate Mobile    :"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -131,7 +141,8 @@
             android:layout_alignTop="@+id/alt_mobile_no"
             android:layout_gravity="right"
             android:layout_toRightOf="@+id/alt_mobile_txt"
-            android:textSize="1dp" />
+            android:textSize="1dp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/alt_mobile_no"
@@ -139,9 +150,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/mobile_no"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/alt_mobile_image"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -150,10 +162,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/alt_mobile_no"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Address :"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/address_image"
@@ -161,9 +174,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/alt_mobile_no"
             android:layout_gravity="left"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/address_txt"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -173,9 +187,10 @@
             android:layout_below="@+id/alt_mobile_no"
             android:layout_gravity="left"
 
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/address_image"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -184,10 +199,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/address_txt"
             android:layout_gravity="left"
-            android:layout_marginTop="21dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Pending reason :"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/pending_reason"
@@ -197,7 +212,8 @@
             android:layout_gravity="left"
             android:layout_marginTop="20dp"
             android:layout_toRightOf="@+id/pending_reason_txt"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -206,10 +222,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/pending_reason_txt"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Dealer    : "
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -218,9 +235,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/pending_reason_txt"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/dealer_name_txt"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -229,10 +247,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/dealer_name"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="Reg.by   : "
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium" />
 
 
         <TextView
@@ -241,9 +259,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/dealer_name"
             android:layout_gravity="left"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_toRightOf="@+id/employee_name_txt"
-            android:textSize="15sp" />
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="sans-serif-condensed-medium"/>
 
         <TextView
             android:id="@+id/frwd_app_rmrk"
@@ -256,7 +275,7 @@
             android:layout_marginBottom="2dp"
             android:textColor="@color/black"
             android:textSize="13sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-condensed-medium"/>
 
 
         <TextView
@@ -270,7 +289,7 @@
             android:layout_marginBottom="2dp"
             android:textColor="@color/black"
             android:textSize="13sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-condensed-medium" />
 
         <LinearLayout
             android:layout_below="@+id/pend_frwd_app"
@@ -292,8 +311,8 @@
                 android:background="@layout/rounded_corner_blue"
                 android:text=" Start  Complaint  "
                 android:textColor="@color/white"
-                android:textSize="9sp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/_12sdp"
+                android:fontFamily="sans-serif-condensed-medium" />
 
 
             <TextView
@@ -309,25 +328,26 @@
                 android:background="@layout/rounded_corner_blue"
                 android:text=" Issue Material  "
                 android:textColor="@color/white"
-                android:textSize="9sp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/_12sdp"
+                android:fontFamily="sans-serif-condensed-medium"/>
 
 
             <TextView
                 android:textAlignment="center"
                 android:gravity="center"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:id="@+id/txtViewPhotoIDAMT"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_22sdp"
+                android:layout_height="@dimen/_30sdp"
                 android:layout_marginStart="@dimen/_30sdp"
                 android:layout_marginEnd="@dimen/_30sdp"
                 android:layout_weight="1"
                 android:background="@layout/rounded_corner_blue"
                 android:text=" View Photo "
                 android:textColor="@color/white"
-                android:textSize="9sp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:fontFamily="sans-serif-condensed-medium" />
 
             <TextView
                 android:layout_marginStart="@dimen/_30sdp"
@@ -336,13 +356,15 @@
                 android:gravity="center"
                 android:id="@+id/comp_dtl"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_22sdp"
+                android:layout_height="@dimen/_30sdp"
                 android:layout_weight="1"
                 android:background="@layout/rounded_corner_blue"
-                android:text="View"
+                android:text="View Details"
                 android:textColor="@color/white"
-                android:textSize="9sp"
-                android:textStyle="bold" />
+                android:textSize="@dimen/_12sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
+               android:fontFamily="sans-serif-condensed-medium"/>
 
 
         </LinearLayout>

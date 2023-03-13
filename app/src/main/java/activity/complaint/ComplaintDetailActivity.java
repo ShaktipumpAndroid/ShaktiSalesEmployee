@@ -877,6 +877,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("Range")
     public void getComplaintHeader() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -1130,7 +1131,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
                 while (cursor.moveToNext()) {
 //                    list_cmp_category.add(cursor.getString(cursor.getColumnIndex("category")));
-                    String catType = cursor.getString(cursor.getColumnIndex("category"));
+                    @SuppressLint("Range") String catType = cursor.getString(cursor.getColumnIndex("category"));
                     if(catType.equalsIgnoreCase("freelancer--12") || catType.equalsIgnoreCase("service center--1") ||
                             catType.equalsIgnoreCase("sales return--3") || catType.equalsIgnoreCase("burglary claims--16") ||
                             catType.equalsIgnoreCase("transportation claim--9") || catType.equalsIgnoreCase("Nature claims--15") ||
@@ -1167,6 +1168,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("Range")
     public void getComplaintDefect() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -1260,6 +1262,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("Range")
     public void getCloserReason_item_1() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -1311,6 +1314,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("Range")
     public void getCloserReason_item_2() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -1361,6 +1365,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("Range")
     public void getCloserReason_item_3() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -2690,7 +2695,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         mediaRecorder.setOutputFile(AudioSavePathInDevice);
     }
 
@@ -2826,11 +2831,7 @@ public class ComplaintDetailActivity extends AppCompatActivity {
 
     }
 
-    public void SyncCheckInOutInBackground() {
-        Intent i = new Intent(ComplaintDetailActivity.this, SyncDataService.class);
-        startService(i);
 
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -2857,6 +2858,8 @@ public class ComplaintDetailActivity extends AppCompatActivity {
                 if (category()) {
                     PathUtil.setSharedPreference(mContext, "cmp_no", cmp_no);
                     PathUtil.setSharedPreference(mContext, "cmp_category", cmp_category);
+                    PathUtil.setSharedPreference(mContext, "cust_name", cmp_customer_name.getText().toString());
+
 //**********************************  old attachment *************************************
                     Intent intent1 = new Intent(getApplicationContext(), ComplaintImageActivity.class);
                     //Log.d("cmp_category1",cmp_no+"--"+cmp_category);

@@ -562,7 +562,7 @@ public class  SyncDataToSAP_New {
                     jsonObj.put("cmpno", complaintImages.get(i).getCmpno());
                     jsonObj.put("posnr", image_item);
                     jsonObj.put("category", complaintImages.get(i).getCategory());
-                    jsonObj.put("image", complaintImages.get(i).getImage());
+                    jsonObj.put("image", CustomUtility.getBase64FromBitmap(mContext,complaintImages.get(i).getImage()));
                     ja_complaintImage.put(jsonObj);
                 } catch (JSONException e) {
                     e.printStackTrace();

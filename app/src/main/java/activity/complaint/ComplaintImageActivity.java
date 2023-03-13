@@ -1,18 +1,30 @@
 package activity.complaint;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
@@ -20,27 +32,38 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import activity.CameraActivity;
+import activity.CustomUtility;
+import activity.OtherImgActivity;
 import bean.ComplaintImage;
+import bean.LoginBean;
 import database.DatabaseHelper;
+import model.ImageModel;
 import other.PathUtil;
 import searchlist.complaint.Complaint_Image_ListViewAdapter;
 import searchlist.complaint.Complaint_Image_Name;
+import webservice.Constants;
 
-public class ComplaintImageActivity extends AppCompatActivity {
+public class ComplaintImageActivity extends AppCompatActivity implements Complaint_Image_ListViewAdapter.ImageSelectionListner {
+    private static final int REQUEST_CODE_PERMISSION = 123;
     Context mContext;
     ListView list;
     ArrayList<Complaint_Image_Name> arraylist = new ArrayList<>();
     String cmp_no = "", cmp_category = "", category_name = "";
     Complaint_Image_ListViewAdapter adapter;
-    String audio_record = "", image_item = "";
+    String  image_item = "";
     ArrayList<ComplaintImage> list_complaintImageTaken;
-    File file = null;
+    DatabaseHelper dataHelper;
 
+    int Index;
+    Complaint_Image_Name  complaintImage;
+    DatabaseHelper databaseHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complaint_image);
         mContext = this;
+        dataHelper = new DatabaseHelper(mContext);
         Toolbar mToolbar = findViewById(R.id.toolbar);
         list = findViewById(R.id.listview);
         setSupportActionBar(mToolbar);
@@ -50,7 +73,6 @@ public class ComplaintImageActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Complaint Image");
         cmp_no = PathUtil.getSharedPreferences(mContext, "cmp_no");
         cmp_category = PathUtil.getSharedPreferences(mContext, "cmp_category");
-        // Log.d("cmp_category2",cmp_category);
         String CurrentString = cmp_category;
         String[] separated;
         separated = CurrentString.split("--");
@@ -62,10 +84,14 @@ public class ComplaintImageActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+          databaseHelper = new DatabaseHelper(this);
+       Log.e("ComplaintImageSize", String.valueOf(databaseHelper.getComplaintImage().size()));
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == android.R.id.home) {
             onBackPressed();
@@ -95,15 +121,9 @@ public class ComplaintImageActivity extends AppCompatActivity {
                     image_name.setItem(cursor.getString(cursor.getColumnIndex("image_item")));
                     image_name.setName(cursor.getString(cursor.getColumnIndex("cmp_image")));
                     arraylist.add(image_name);
-                    Log.e("comp1", "&&&&&" + cursor.getString(cursor.getColumnIndex("category")));
-                    Log.e("comp2", "&&&&&" + cursor.getString(cursor.getColumnIndex("image_item")));
-                    Log.e("comp3", "&&&&&" + cursor.getString(cursor.getColumnIndex("cmp_image")));
-                    // Pass results to ListViewAdapter Class
-                    adapter = new Complaint_Image_ListViewAdapter(this, arraylist, cmp_category, list_complaintImageTaken, cmp_no);
-                    // Binds the Adapter to the ListView
+                    adapter = new Complaint_Image_ListViewAdapter(this, arraylist);
                     list.setAdapter(adapter);
-                    lv_category = cursor.getString(cursor.getColumnIndex("category"));
-                    lv_image_item = cursor.getString(cursor.getColumnIndex("image_item"));
+                    adapter.ImgSelectionListner(ComplaintImageActivity.this);
                 }
             }
             db.setTransactionSuccessful();
@@ -120,16 +140,7 @@ public class ComplaintImageActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            audio_record = adapter.onActivityResult(requestCode, resultCode, data, cmp_category, cmp_no);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @SuppressLint("Range")
     public void check_complaint_image() {
@@ -152,11 +163,6 @@ public class ComplaintImageActivity extends AppCompatActivity {
                     complaintImage.setCmpno(cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_CMPNO)));
                     complaintImage.setPosnr(cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_POSNR)));
                     complaintImage.setCategory(cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_CATEGORY)));
-                    //  Log.d("image_taken5",""+ cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_POSNR)));
-                    Log.e("checkcomp1", "&&&&&" + cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_ID)));
-                    Log.e("checkcomp2", "&&&&&" + cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_CMPNO)));
-                    Log.e("checkcomp3", "&&&&&" + cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_POSNR)));
-                    Log.e("checkcomp4", "&&&&&" + cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_CATEGORY)));
                     list_complaintImageTaken.add(complaintImage);
                 }
             }
@@ -168,5 +174,70 @@ public class ComplaintImageActivity extends AppCompatActivity {
             }
             db.close();
         }
+    }
+
+    @Override
+    public void ImgSelectionLis(int position, Complaint_Image_Name complaintImageName) {
+
+        if ( !(ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) || !(ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA
+                            , Manifest.permission.WRITE_EXTERNAL_STORAGE,},
+                    REQUEST_CODE_PERMISSION);
+
+
+        }else {
+            Index = position;
+            complaintImage = complaintImageName;
+             image_item = "101" +complaintImageName.getItem();
+            openCamera();
+        }
+
+    }
+
+
+    private void openCamera() {
+        camraLauncher.launch(new Intent(ComplaintImageActivity.this, CameraActivity.class).putExtra("cust_name",PathUtil.getSharedPreferences(mContext,"cust_name")).putExtra("FrontCamera","0"));
+
+    }
+
+    ActivityResultLauncher<Intent> camraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        if (result.getData() != null && result.getData().getExtras() != null) {
+
+                            Bundle bundle = result.getData().getExtras();
+                            Log.e("bundle====>", bundle.get("data").toString());
+
+
+                            dataHelper.insertComplaintImage
+                                    (cmp_no,
+                                            image_item,
+                                            cmp_category,
+                                            bundle.get("data").toString());
+                            updateValue();
+                            Log.e("ComplaintImageSize", String.valueOf(databaseHelper.getComplaintImage().size()));
+
+                        }
+
+                    }
+                }
+            });
+
+    private void updateValue() {
+        Complaint_Image_Name complaintImageName = new Complaint_Image_Name();
+        complaintImageName.setName(complaintImage.getName());
+        complaintImageName.setItem(complaintImage.getItem());
+        complaintImageName.setCategory(complaintImage.getCategory());
+        complaintImageName.setImgSelected(true);
+        arraylist.set(Index,complaintImageName);
+        adapter.notifyDataSetChanged();
     }
 }
