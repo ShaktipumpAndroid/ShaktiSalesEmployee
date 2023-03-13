@@ -4,18 +4,21 @@ package activity;
  * Created by shakti on 10/3/2016.
  */
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+import static android.content.Context.LOCATION_SERVICE;
+import static androidx.core.content.ContextCompat.checkSelfPermission;
+
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -32,11 +35,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.StrictMode;
-
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Html;
@@ -57,7 +58,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -69,6 +69,13 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.common.IntentSenderForResultStarter;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
 import org.apache.http.NameValuePair;
@@ -83,21 +90,15 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-
 
 import activity.complaint.ComplaintDashboard;
-import adapter.PendingComplainRemarkListAdapter;
-
 import bean.LocalConvenienceBean;
 import bean.LoginBean;
 import bean.vkbean.LatLongBeanVK;
-import bean.vkbean.RemarkResponseList;
 import database.DatabaseHelper;
 import models.DistanceResponse;
 import models.Element;
@@ -107,13 +108,8 @@ import rest.RestUtil;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import searchlist.UnsyncData;
 import webservice.CustomHttpClient;
 import webservice.WebURL;
-
-import static android.app.Activity.RESULT_OK;
-import static android.content.Context.LOCATION_SERVICE;
-import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 
 //import com.shaktipumps.shakti.material_design.R;
@@ -122,11 +118,11 @@ import static androidx.core.content.ContextCompat.checkSelfPermission;
 /*public class HomeFragment extends Fragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {*/
 
+@SuppressWarnings("deprecation")
 public class HomeFragment extends Fragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     ProgressDialog progressDialog;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
-    Context context;
     TextView btn_unsync;
     TextView tv_notification, start, end, offlinedata;
 
@@ -147,7 +143,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             count_clouser_complaint,
             count_pending_complaint;
 
-    String start_add;
     String from_lat;
     String from_lng;
     String to_lat;
@@ -161,32 +156,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     List<LatLongBeanVK> mLatLongBeanVKList;
 
-    private NewLocationUpdatesService mNewLocationUpdatesService = null;
-    // Tracks the bound state of the service.
-    private boolean mBound = false;
+    private final NewLocationUpdatesService mNewLocationUpdatesService = null;
 
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            NewLocationUpdatesService.LocalBinder binder = (NewLocationUpdatesService.LocalBinder) service;
-            mNewLocationUpdatesService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mNewLocationUpdatesService = null;
-            mBound = false;
-        }
-    };
-
-    Button btn_route, btn_target, btn_dsr, btn_file, btn_report, btn_attendance, btn_adhoc_customer, btn_adhoc_order, btn_complaint, btn_goods_recp, btn_goods_iss, btn_goods_can, btn_stk_det_rep;
+    Button btn_route, btn_target, btn_dsr, btn_report, btn_attendance, btn_adhoc_order, btn_complaint, btn_goods_recp, btn_goods_iss, btn_goods_can, btn_stk_det_rep;
     Handler mHandler = new android.os.Handler() {
         @Override
         public void handleMessage(Message msg) {
             String mString = (String) msg.obj;
-            Toast.makeText(context, mString, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), mString, Toast.LENGTH_LONG).show();
         }
     };
 
@@ -195,8 +172,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     FusedLocationProviderClient fusedLocationClient;
     protected LocationRequest locationRequest;
     protected Location location;
-    protected android.location.LocationListener locationListener;
-    LocationCallback locationCallback;
 
     private CustomUtility customutility = null;
 
@@ -205,13 +180,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     String fullAddress1 = null;
     String distance1 = null;
     String startphoto = null;
-    String endphoto = null;
-
-    private AlarmManager alarmMgr;
-    private PendingIntent alarmIntent;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
+    private AppUpdateManager appUpdateManager;
+    private static final int IMMEDIATE_APP_UPDATE_REQ_CODE = 100;
     // lists for permissions
     private ArrayList<String> permissionsToRequest;
     private ArrayList<String> permissionsRejected = new ArrayList<>();
@@ -237,18 +209,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = this.getActivity();
-
         customutility = new CustomUtility();
-        progressDialog = new ProgressDialog(context);
-        alarmMgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        dataHelper = new DatabaseHelper(context);
-        SharedPreferences pref = context.getSharedPreferences("MyPref", 0);
+        progressDialog = new ProgressDialog(getActivity());
+        dataHelper = new DatabaseHelper(getActivity());
+        SharedPreferences pref = getActivity().getSharedPreferences("MyPref", 0);
         mUserID = pref.getString("key_username", "userid");
 
         lb = new LoginBean();
         mLatLongBeanVKList = new ArrayList<>();
-        locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
 
         // we add permissions we need to request location of the users
@@ -268,12 +237,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        if (checkPlayServices()) {
+        if (!checkPlayServices()) {
 
-        } else {
-            Toast.makeText(context, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
         }
-
+        //InappUpdate
+        appUpdateManager = AppUpdateManagerFactory.create(getActivity());
+        checkUpdate();
 
     }
 
@@ -282,7 +252,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        deleteCache(context);
+        deleteCache(getActivity());
 
 
         btn_route = rootView.findViewById(R.id.btn_route);
@@ -318,7 +288,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         end.setOnClickListener(this);
         offlinedata.setOnClickListener(this);
 
-        if (CustomUtility.getSharedPreferences(context, "localconvenience").equalsIgnoreCase("0")) {
+        if (CustomUtility.getSharedPreferences(getActivity(), "localconvenience").equalsIgnoreCase("0")) {
             changeButtonVisibility(false, 0.5f, end);
         } else {
             changeButtonVisibility(false, 0.5f, start);
@@ -332,88 +302,82 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         }
 
 
-        btn_attendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btn_attendance.setOnClickListener(view -> {
 
 
-                if (CustomUtility.CheckGPS(context) && validateDate()) {
-                    Intent intent = new Intent(context, MarkAttendanceActivity.class);
-                    startActivity(intent);
-                }
+            if (CustomUtility.CheckGPS(getActivity()) && validateDate()) {
+                Intent intent = new Intent(getActivity(), MarkAttendanceActivity.class);
+                startActivity(intent);
             }
         });
 
-        btn_route.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //getDistanceFromGoogleAPI();
-                if (CustomUtility.CheckGPS(context) && validateDate()) {
-                    Intent intent = new Intent(context, RouteActivity.class);
-                    startActivity(intent);
-                }
+        btn_route.setOnClickListener(view -> {
+            //getDistanceFromGoogleAPI();
+            if (CustomUtility.CheckGPS(getActivity()) && validateDate()) {
+                Intent intent = new Intent(getActivity(), RouteActivity.class);
+                startActivity(intent);
             }
         });
 
         btn_target.setOnClickListener(view -> {
-            Intent intent = new Intent(context, TargetActivity.class);
+            Intent intent = new Intent(getActivity(), TargetActivity.class);
             startActivity(intent);
         });
 
         btn_dsr.setOnClickListener(view -> {
-            if (CustomUtility.CheckGPS(context) && validateDate()) {
-                Intent intent = new Intent(context, DsrEntryActivity.class);
+            if (CustomUtility.CheckGPS(getActivity()) && validateDate()) {
+                Intent intent = new Intent(getActivity(), DsrEntryActivity.class);
                 startActivity(intent);
             }
         });
 
         btn_adhoc_order.setOnClickListener(view -> {
-            if (CustomUtility.CheckGPS(context) && validateDate()) {
-                Intent intent = new Intent(context, AdhocOrderActivity.class);
+            if (CustomUtility.CheckGPS(getActivity()) && validateDate()) {
+                Intent intent = new Intent(getActivity(), AdhocOrderActivity.class);
                 startActivity(intent);
             }
         });
 
         btn_complaint.setOnClickListener(view -> {
             if (validateDate()) {
-                Intent intent = new Intent(context, ComplaintDashboard.class);
+                Intent intent = new Intent(getActivity(), ComplaintDashboard.class);
                 startActivity(intent);
             }
         });
 
         btn_goods_recp.setOnClickListener(view -> {
-            if (CustomUtility.isOnline(context)) {
-                Intent intent = new Intent(context, GoodsReceipt_Activity.class);
+            if (CustomUtility.isOnline(getActivity())) {
+                Intent intent = new Intent(getActivity(), GoodsReceipt_Activity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(context, "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
             }
         });
 
         btn_goods_iss.setOnClickListener(view -> {
-            if (CustomUtility.isOnline(context)) {
-                Intent intent = new Intent(context, GoodsIssue_Activity.class);
+            if (CustomUtility.isOnline(getActivity())) {
+                Intent intent = new Intent(getActivity(), GoodsIssue_Activity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(context, "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
             }
         });
 
         btn_goods_can.setOnClickListener(view -> {
-            if (CustomUtility.isOnline(context)) {
-                Intent intent = new Intent(context, GoodsTransDet_Activity.class);
+            if (CustomUtility.isOnline(getActivity())) {
+                Intent intent = new Intent(getActivity(), GoodsTransDet_Activity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(context, "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
             }
         });
 
         btn_stk_det_rep.setOnClickListener(view -> {
-            if (CustomUtility.isOnline(context)) {
-                Intent intent = new Intent(context, StockDetailRep_Activity.class);
+            if (CustomUtility.isOnline(getActivity())) {
+                Intent intent = new Intent(getActivity(), StockDetailRep_Activity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(context, "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Please check your internet connection, and try again...", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -427,7 +391,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             count_add_new_customer = "";
             getUnsyncData();
             //Log.d("count_dsr_entry",count_dsr_entry);
-            Intent intent = new Intent(context, UnsyncdataApplication.class);
+            Intent intent = new Intent(getActivity(), UnsyncdataApplication.class);
             intent.putExtra("count_dsr_entry", count_dsr_entry);
             intent.putExtra("count_attendance", count_attendance);
             intent.putExtra("count_frwd_app", count_frwdapp_entry);
@@ -442,34 +406,31 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         });
 
         btn_report.setOnClickListener(view -> {
-            progressDialog = ProgressDialog.show(context, "", "Loading..");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    if (CustomUtility.isOnline(context)) {
-                        if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
-                        try {
-                            Intent mIntent = new Intent(Intent.ACTION_VIEW);
-                            mIntent.setData(Uri.parse(WebURL.DASHBOARD));
-                            startActivity(mIntent);
-                        } catch (ActivityNotFoundException e) {
-                            e.printStackTrace();
-                            Message msg = new Message();
-                            msg.obj = "Not found any Browser App";
-                            mHandler.sendMessage(msg);
-                        }
-                    } else {
-                        if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
+            progressDialog = ProgressDialog.show(getActivity(), "", "Loading..");
+            new Thread(() -> {
+                if (CustomUtility.isOnline(getActivity())) {
+                    if ((progressDialog != null) && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    try {
+                        Intent mIntent = new Intent(Intent.ACTION_VIEW);
+                        mIntent.setData(Uri.parse(WebURL.DASHBOARD));
+                        startActivity(mIntent);
+                    } catch (ActivityNotFoundException e) {
+                        e.printStackTrace();
                         Message msg = new Message();
-                        msg.obj = "No Internet Connection Found, You Are In Offline Mode.";
+                        msg.obj = "Not found any Browser App";
                         mHandler.sendMessage(msg);
                     }
+                } else {
+                    if ((progressDialog != null) && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                    Message msg = new Message();
+                    msg.obj = "No Internet Connection Found, You Are In Offline Mode.";
+                    mHandler.sendMessage(msg);
                 }
             }).start();
         });
@@ -505,30 +466,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
     }
 
     private boolean validateDate() {
-        if (CustomUtility.isDateTimeAutoUpdate(context)) {
+        if (!CustomUtility.isDateTimeAutoUpdate(getActivity())) {
 
-        } else {
-            CustomUtility.showSettingsAlert(context);
+            CustomUtility.showSettingsAlert(getActivity());
             return false;
         }
         return true;
     }
 
     public int getUnsyncData() {
-        UnsyncData usd = null;
-        DatabaseHelper dh = new DatabaseHelper(context);
+
+        DatabaseHelper dh = new DatabaseHelper(getActivity());
         SQLiteDatabase db = dh.getReadableDatabase();
         String userid = LoginBean.getUseid();
-        String selectQuery = null;
+        String selectQuery ;
         Cursor cursor = null;
         int total_unsync = 0;
 
-        /*****************************get dsr entry count ****************************************/
+        //*****************************get dsr entry count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_DSR_ENTRY
                     + " WHERE " + DatabaseHelper.KEY_PERNR + " = '" + userid + "'"
@@ -542,7 +502,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /*****************************get frwd app entry count ****************************************/
+        //*****************************get frwd app entry count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_FRWD_APP_CMP
                     + " WHERE " + DatabaseHelper.KEY_AWT_PERNR + " = '" + userid + "'"
@@ -556,7 +516,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /*****************************get attendance count ****************************************/
+        //*****************************get attendance count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_MARK_ATTENDANCE
                     + " WHERE " + DatabaseHelper.KEY_PERNR + " = '" + userid + "'"
@@ -570,9 +530,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end attendance count ****************************************/
+        //***************************** end attendance count ****************************************/
 
-        /*****************************get order count ****************************************/
+       //*****************************get order count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_ADHOC_FINAL
                     + " WHERE " + DatabaseHelper.KEY_PERSON + " = '" + userid + "'"
@@ -586,10 +546,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end order count ****************************************/
+        //***************************** end order count ****************************************/
 
 
-        /*****************************get no order count ****************************************/
+        //*****************************get no order count ****************************************/
         try {
 
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_NO_ORDER
@@ -608,10 +568,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end no count ****************************************/
+        //***************************** end no count ****************************************/
 
 
-        /*****************************get survey count ****************************************/
+        //*****************************get survey count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_SURVEY
                     + " WHERE " + DatabaseHelper.KEY_PERNR + " = '" + userid + "'"
@@ -625,10 +585,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end survey count ****************************************/
+        //***************************** end survey count ****************************************/
 
 
-        /*****************************get check in out count ****************************************/
+        //*****************************get check in out count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_CHECK_IN_OUT
                     + " WHERE " + DatabaseHelper.KEY_PERNR + " = '" + userid + "'"
@@ -642,10 +602,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end check in out count ****************************************/
+        //***************************** end check in out count ****************************************/
 
 
-        /*****************************get Add new customer count ****************************************/
+        //*****************************get Add new customer count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_NEW_ADDED_CUSTOMER
                     + " WHERE " + DatabaseHelper.KEY_PERNR + " = '" + userid + "'"
@@ -659,10 +619,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** end Add new customer  count ****************************************/
+        //***************************** end Add new customer  count ****************************************/
 
 
-        /***************************** get clouser request count ****************************************/
+        //***************************** get clouser request count ****************************************/
         try {
             selectQuery = "SELECT * FROM " + DatabaseHelper.TABLE_CLOSE_COMPLAINT
                     + " WHERE " + DatabaseHelper.KEY_SYNC + " = '" + "NOT" + "'";
@@ -675,10 +635,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** get clouser request count ****************************************/
+        //***************************** get clouser request count ****************************************/
 
 
-        /***************************** get pending complaint count ****************************************/
+        //***************************** get pending complaint count ****************************************/
         try {
 
 
@@ -698,7 +658,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
             e.printStackTrace();
         }
 
-        /***************************** get pending complaint count  ****************************************/ finally {
+        //***************************** get pending complaint count  ****************************************/
+        finally {
             if (cursor != null) {
                 cursor.close();
                 db.close();
@@ -733,7 +694,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     private boolean hasPermission(String permission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+            return checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
         }
         return true;
     }
@@ -750,10 +711,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(context);
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(getActivity());
         if (resultCode != ConnectionResult.SUCCESS) {
             if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog((Activity) context, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+                apiAvailability.getErrorDialog((Activity) getActivity(), resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
             } else {
                 getActivity().finish();
             }
@@ -764,16 +725,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     public void startLocationUpdates() {
         start_photo_text = "";
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setMaxWaitTime(5000);
         locationRequest.setInterval(10 * 1000);
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
-        fusedLocationClient.getLastLocation().addOnSuccessListener(Objects.requireNonNull(getActivity()), new OnSuccessListener<Location>() {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(final Location location) {
                 final Double[] lat = new Double[1];
@@ -811,10 +772,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                             }
                         };
 
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             return;
                         }
-                        LocationServices.getFusedLocationProviderClient(context).requestLocationUpdates(locationRequest, mLocationCallback, null);
+                        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(locationRequest, mLocationCallback, null);
                     }
                     progressDialog = ProgressDialog.show(getActivity(), "Loading...", "Please wait !");
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -828,7 +789,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         progressDialog = null;
                                     }
 
-                                final Dialog dialog = new Dialog(context);
+                                final Dialog dialog = new Dialog(getActivity());
                                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                                 dialog.setCancelable(false);
                                 dialog.setContentView(R.layout.custom_dialog1);
@@ -847,7 +808,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                 final TextView etcncl = dialog.findViewById(R.id.btn_cncl);
                                 final TextView etconfm = dialog.findViewById(R.id.btn_cnfrm);
 
-                                Geocoder geo = new Geocoder(context.getApplicationContext(), Locale.getDefault());
+                                Geocoder geo = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
                                 List<Address> addresses = null;
                                 if (location != null) {
                                     try {
@@ -870,7 +831,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                 ettxt1.setText("Current Location");
                                 ettxt2.setText(Html.fromHtml(getString(R.string.confirm)));
 
-                                // Toast.makeText(context, "from_lat="+from_lat+"\nfrom_lng="+from_lng, Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(getActivity(), "from_lat="+from_lat+"\nfrom_lng="+from_lng, Toast.LENGTH_SHORT).show();
 
                                 photo1.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -895,7 +856,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         if (mNewLocationUpdatesService != null) { // add null checker
                                             mNewLocationUpdatesService.requestLocationUpdates();
                                         }
-//                                        if (CustomUtility.isOnline(context)) {
+//                                        if (CustomUtility.isOnline(getActivity())) {
                                         LocalConvenienceBean localConvenienceBean = new LocalConvenienceBean(LoginBean.getUseid(),
                                                 current_start_date,
                                                 "",
@@ -913,13 +874,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         );
                                         dataHelper.insertLocalconvenienceData(localConvenienceBean);
                                         //   startLocation();
-                                        CustomUtility.setSharedPreference(context, "localconvenience", "1");
+                                        CustomUtility.setSharedPreference(getActivity(), "localconvenience", "1");
                                         changeButtonVisibility(false, 0.5f, start);
                                         changeButtonVisibility(true, 1f, end);
                                         Toast.makeText(getActivity(), "Your Journey will be Started...", Toast.LENGTH_LONG).show();
                                         dialog.dismiss();
 //                                        } else {
-//                                            Toast.makeText(context, "Please Connect to Internet...", Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(getActivity(), "Please Connect to Internet...", Toast.LENGTH_SHORT).show();
 //                                        }
                                     }
                                 });
@@ -930,7 +891,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         progressDialog.dismiss();
                                         progressDialog = null;
                                     }
-                                Toast.makeText(context, "Please wait for your current location.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Please wait for your current location.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }, 2000);
@@ -954,7 +915,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         StrictMode.setThreadPolicy(policy);
         final ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
         param.clear();
-        if (CustomUtility.isOnline(context)) {
+        if (CustomUtility.isOnline(getActivity())) {
             try {
 //********************************** check app version ********************************************
                 //********************************** check logout session ********************************************
@@ -1007,15 +968,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     public void startLocationUpdates1() {
         end_photo_text = "";
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setMaxWaitTime(5000);
         locationRequest.setInterval(10 * 1000);
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        fusedLocationClient.getLastLocation().addOnSuccessListener(Objects.requireNonNull(getActivity()), new OnSuccessListener<Location>() {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 from_lat = " ";
@@ -1055,16 +1016,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                             }
                         };
 
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             return;
                         }
-                        LocationServices.getFusedLocationProviderClient(context).requestLocationUpdates(locationRequest, mLocationCallback, null);
+                        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(locationRequest, mLocationCallback, null);
                     }
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
                 fullAddress = localConvenienceBean.getStart_loc();
-                if (CustomUtility.isOnline(context)) {
+                if (CustomUtility.isOnline(getActivity())) {
                     if (mLatLongBeanVKList.size() > 0)
                         mLatLongBeanVKList.clear();
                     progressDialog = ProgressDialog.show(getActivity(), "Loading...", "Please wait !");
@@ -1084,7 +1045,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         progressDialog.dismiss();
                                         progressDialog = null;
                                     }
-                                Toast.makeText(context, "Please wait for your current location.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "Please wait for your current location.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }, 2000);
@@ -1092,7 +1053,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                         mNewLocationUpdatesService.removeLocationUpdates();
                     }
                 } else {
-                    Toast.makeText(context, "Please Connect to Internet...,Your Data is Saved to the Offline Mode.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please Connect to Internet...,Your Data is Saved to the Offline Mode.", Toast.LENGTH_SHORT).show();
                     LocalConvenienceBean localConvenienceBean = new LocalConvenienceBean(LoginBean.getUseid(), current_start_date,
                             current_end_date,
                             current_start_time,
@@ -1108,7 +1069,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                             end_photo_text
                     );
                     dataHelper.updateLocalconvenienceData(localConvenienceBean);
-                    CustomUtility.setSharedPreference(context, "localconvenience", "0");
+                    CustomUtility.setSharedPreference(getActivity(), "localconvenience", "0");
                     changeButtonVisibility(false, 0.5f, end);
                     changeButtonVisibility(true, 1f, start);
                 }
@@ -1127,7 +1088,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         switch (id) {
             case R.id.start:
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//                    if (CustomUtility.isOnline(context)) {
+//                    if (CustomUtility.isOnline(getActivity())) {
                     startLocationUpdates();
 //                    } else {
 //                        Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
@@ -1147,15 +1108,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                 break;
 
             case R.id.offlinedata:
-                Intent intnt = new Intent(context, OfflineDataConveyance.class);
+                Intent intnt = new Intent(getActivity(), OfflineDataConveyance.class);
                 startActivity(intnt);
                 break;
         }
     }
 
     private void buildAlertMessageNoGps() {
-//        if (CustomUtility.isOnline(context)) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//        if (CustomUtility.isOnline(getActivity())) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Please turn on the GPRS and keep it on while traveling on tour/trip.")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -1179,14 +1140,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     }
 
     private void buildAlertMessageNoGps1() {
-        if (CustomUtility.isOnline(context)) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (CustomUtility.isOnline(getActivity())) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Please turn on the GPRS and keep it on while traveling on tour/trip.")
                     .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                             startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                           /* android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(context);
+                           /* android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(getActivity());
                             // Setting Dialog Title
                             alertDialog.setTitle("Confirmation");
                             // Setting Dialog Message
@@ -1255,7 +1216,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                 if (permissionsRejected.size() > 0) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (shouldShowRequestPermissionRationale(permissionsRejected.get(0))) {
-                            new AlertDialog.Builder(context).
+                            new AlertDialog.Builder(getActivity()).
                                     setMessage("These permissions are mandatory to get your location. You need to allow them.").
                                     setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
@@ -1347,7 +1308,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                         fullAddress1 = response.body().getDestinationAddresses().get(0);
                         distance1 = element.getDistance().getText();
 
-                        final Dialog dialog = new Dialog(context);
+                        final Dialog dialog = new Dialog(getActivity());
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setCancelable(false);
                         dialog.setContentView(R.layout.custom_dialog2);
@@ -1406,10 +1367,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
                                 final String travel_mode = ettrvlmod.getText().toString();
 
-                                if (CustomUtility.isOnline(context)) {
+                                if (CustomUtility.isOnline(getActivity())) {
                                     if (!TextUtils.isEmpty(travel_mode) && !travel_mode.equals("")) {
 
-                                        progressDialog = ProgressDialog.show(context, "", "Sending Data to server..please wait !");
+                                        progressDialog = ProgressDialog.show(getActivity(), "", "Sending Data to server..please wait !");
 
                                         new Thread(new Runnable() {
                                             public void run() {
@@ -1446,10 +1407,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                                         dialog.dismiss();
 
                                     } else {
-                                        Toast.makeText(context, "Please Enter Travel Mode.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "Please Enter Travel Mode.", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    Toast.makeText(context, "Please Connect to Internet...", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Please Connect to Internet...", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -1503,9 +1464,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
     @Override
     public void onLocationChanged(Location location) {
 
-        if (ActivityCompat.checkSelfPermission(context,
+        if (ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context,
+                && ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -1525,7 +1486,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         String docno_sap = null;
         String invc_done = null;
 
-        DatabaseHelper db = new DatabaseHelper(this.context);
+        DatabaseHelper db = new DatabaseHelper(this.getActivity());
 
         LocalConvenienceBean param_invc = new LocalConvenienceBean();
 
@@ -1599,7 +1560,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                         msg.obj = docno_sap;
                         mHandler.sendMessage(msg);
                         db.deleteLocalconvenienceDetail(endat, endtm);
-                        CustomUtility.setSharedPreference(context, "localconvenience", "0");
+                        CustomUtility.setSharedPreference(getActivity(), "localconvenience", "0");
                         changeButtonVisibility(false, 0.5f, end);
                         changeButtonVisibility(true, 1f, start);
 
@@ -1654,12 +1615,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
         final CharSequence[] items = {"Take Photo", "Cancel"};
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.MyDialogTheme);
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity(), R.style.MyDialogTheme);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result = CustomUtility.checkPermission(context);
+                boolean result = CustomUtility.checkPermission(getActivity());
                 if (items[item].equals("Take Photo")) {
 
                     if (result) {
@@ -1675,11 +1636,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
         builder.show();
     }
 
+    private void checkUpdate() {
+
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                startUpdateFlow(appUpdateInfo);
+            } else if  (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS){
+                startUpdateFlow(appUpdateInfo);
+            }
+        });
+    }
+
+    private void startUpdateFlow(AppUpdateInfo appUpdateInfo) {
+        try {
+            appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.IMMEDIATE, (IntentSenderForResultStarter) this, HomeFragment.IMMEDIATE_APP_UPDATE_REQ_CODE);
+        } catch (IntentSender.SendIntentException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // if the result is capturing Image
-        Bitmap bitmap = null;
+        Bitmap bitmap ;
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
 
@@ -1722,8 +1705,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                 if (file.exists()) {
                     file.delete();
                 }
+            }
+        }
 
-
+        if (requestCode == IMMEDIATE_APP_UPDATE_REQ_CODE) {
+            if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(getActivity(), "Update canceled by user! Result Code: " + resultCode, Toast.LENGTH_LONG).show();
+            } else if (resultCode == RESULT_OK) {
+                Toast.makeText(getActivity(), "Update success!" , Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), "Update Failed! Result Code: " + resultCode, Toast.LENGTH_LONG).show();
+                checkUpdate();
             }
         }
 
@@ -1775,7 +1767,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
 
     public void openCamera(String keyimage) {
 
-        if (CameraUtils.checkPermissions(context)) {
+        if (CameraUtils.checkPermissions(getActivity())) {
 
             Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -1786,7 +1778,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Goog
                 Log.e("PATH", "&&&" + imageStoragePath);
             }
 
-            Uri fileUri = CameraUtils.getOutputMediaFileUri(context, file);
+            Uri fileUri = CameraUtils.getOutputMediaFileUri(getActivity(), file);
 
             Log.e("PATH", "&&&" + fileUri);
 
