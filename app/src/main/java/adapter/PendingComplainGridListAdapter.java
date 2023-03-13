@@ -1,5 +1,6 @@
 package adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -61,7 +62,7 @@ public class PendingComplainGridListAdapter extends RecyclerView.Adapter<Pending
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
        // holder.imgGRIDID.setImageResource(Integer.parseInt(al.get(position)));
         if (al.get(position) != null && !al.get(position).isEmpty()) {

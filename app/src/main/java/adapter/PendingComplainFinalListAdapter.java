@@ -1,5 +1,6 @@
 package adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Message;
@@ -54,7 +55,7 @@ public class PendingComplainFinalListAdapter extends RecyclerView.Adapter<Pendin
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
 
         holder.txtDealerOEMValueID.setText(mComplainAllResponse.get(position).getName1());
