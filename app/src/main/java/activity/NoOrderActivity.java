@@ -521,7 +521,7 @@ public class NoOrderActivity extends AppCompatActivity {
 
     public void openCamera() {
 
-        camraLauncher.launch(new Intent(NoOrderActivity.this, CameraActivity.class).putExtra("cust_name", customer_name));
+        camraLauncher.launch(new Intent(NoOrderActivity.this, CameraActivity.class).putExtra("cust_name", customer_name).putExtra("FrontCamera","0"));
 
     }
 

@@ -134,7 +134,7 @@ public class OtherImgActivity extends AppCompatActivity {
 
         if (CameraUtils.checkPermissions(mContext)) {
 
-            camraLauncher.launch(new Intent(OtherImgActivity.this, CameraActivity.class).putExtra("cust_name", customer_name));
+            camraLauncher.launch(new Intent(OtherImgActivity.this, CameraActivity.class).putExtra("cust_name", customer_name).putExtra("FrontCamera","0"));
 
         }
     }

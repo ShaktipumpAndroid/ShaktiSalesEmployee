@@ -48,7 +48,6 @@ import webservice.WebURL;
 public class PendingComplainPhotoGridActivity extends AppCompatActivity {
 
     private Context mContext;
-    private ProgressDialog progressDialog;
 
     //private List<ComplainDetailListResponse> mComplainDetailListResponse;
 
@@ -345,8 +344,8 @@ public class PendingComplainPhotoGridActivity extends AppCompatActivity {
         param.clear();
         //param.add(new BasicNameValuePair("CMPNO", cmpno));
         param.add(new BasicNameValuePair("CMPNO", cmpno));
-       // param.add(new BasicNameValuePair("POSNR", "000001"));
-        param.add(new BasicNameValuePair("POSNR", mStatusValue));
+        param.add(new BasicNameValuePair("POSNR", "000001"));
+      //  param.add(new BasicNameValuePair("POSNR", mStatusValue));
 
 
         try {
@@ -500,7 +499,7 @@ public class PendingComplainPhotoGridActivity extends AppCompatActivity {
                         // Toast.makeText(mContext, mMessage, Toast.LENGTH_SHORT).show();
                         mPendingComplainGridListAdapter = new PendingComplainGridListAdapter(mContext, al, mStatusValue);
                         rclyPendingComplainList.setAdapter(mPendingComplainGridListAdapter);
-                        progressDialog.dismiss();
+
                     }
 
 

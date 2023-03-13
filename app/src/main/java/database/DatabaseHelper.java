@@ -4115,7 +4115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // on below line we are creating a cursor with query to
         // read data from database.
-        Cursor cursor = db.rawQuery("SELECT * FROM  " + TABLE_CHECK_IN_OUT, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM  " + TABLE_CHECK_IN_OUT + " WHERE " + KEY_SYNC + " = '" + "NOT" + "'", null);
 
         // moving our cursor to first position.
         if (cursor!=null && cursor.moveToFirst()) {
@@ -4801,7 +4801,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = null;
         Cursor cursor = null;
         try {
-            selectQuery = "SELECT * FROM " + TABLE_ZCMPLN_IMAGE;
+            selectQuery = "SELECT * FROM " + TABLE_ZCMPLN_IMAGE + " WHERE " + KEY_SYNC + " = '" + "NOT" + "'";
             cursor = db.rawQuery(selectQuery, null);
 
             if (cursor.getCount() > 0) {

@@ -125,7 +125,11 @@
     <string name="customer_place_label">"customer place  : "</string>
     <string name="customer_distance_label">"customer distance  : "</string>
     <string name="take_photo">Takephoto</string>
-
+    <string name="title">Please Select Image</string>
+    <string name="OK">OK</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="cancle">Cancle</string>
 
     <string-array name="array_paymnet_by">
         <item>Pay By</item>

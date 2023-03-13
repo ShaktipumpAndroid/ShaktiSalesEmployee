@@ -3,25 +3,31 @@ package activity.complaint;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -29,23 +35,27 @@ import androidx.core.app.ActivityCompat;
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import activity.CameraActivity;
 import activity.CustomUtility;
-import activity.OtherImgActivity;
 import bean.ComplaintImage;
 import bean.LoginBean;
 import database.DatabaseHelper;
-import model.ImageModel;
 import other.PathUtil;
 import searchlist.complaint.Complaint_Image_ListViewAdapter;
 import searchlist.complaint.Complaint_Image_Name;
-import webservice.Constants;
 
 public class ComplaintImageActivity extends AppCompatActivity implements Complaint_Image_ListViewAdapter.ImageSelectionListner {
     private static final int REQUEST_CODE_PERMISSION = 123;
+    private static final int GALLERY_IMAGE_REQUEST_CODE = 101;
+
+    private static final String GALLERY_DIRECTORY_NAME_COMMON = "SurfaceCamera";
+
     Context mContext;
     ListView list;
     ArrayList<Complaint_Image_Name> arraylist = new ArrayList<>();
@@ -58,6 +68,7 @@ public class ComplaintImageActivity extends AppCompatActivity implements Complai
     int Index;
     Complaint_Image_Name  complaintImage;
     DatabaseHelper databaseHelper;
+    AlertDialog alertDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,14 +205,89 @@ public class ComplaintImageActivity extends AppCompatActivity implements Complai
             Index = position;
             complaintImage = complaintImageName;
              image_item = "101" +complaintImageName.getItem();
-            openCamera();
+
+             selectImagePopup();
         }
+
+    }
+
+    private void selectImagePopup() {
+        LayoutInflater inflater = (LayoutInflater) mContext
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.select_image_popup,
+                null);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.MyDialogTheme);
+
+        builder.setView(layout);
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        alertDialog.show();
+
+        TextView title_txt = layout.findViewById(R.id.title_txt);
+        title_txt.setText(R.string.title);
+        TextView gallery,camera,cancle;
+        gallery = layout.findViewById(R.id.gallery_txt);
+        camera = layout.findViewById(R.id.camera_txt);
+        cancle = layout.findViewById(R.id.cancle_txt);
+        gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openGallery();
+                alertDialog.dismiss();
+            }
+        });
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCamera();
+                alertDialog.dismiss();
+            }
+        });
+        cancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    alertDialog.dismiss();
+            }
+        });
+    }
+
+    private void openGallery() {
+
+
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(i, "Select Photo"),GALLERY_IMAGE_REQUEST_CODE );
+
 
     }
 
 
     private void openCamera() {
         camraLauncher.launch(new Intent(ComplaintImageActivity.this, CameraActivity.class).putExtra("cust_name",PathUtil.getSharedPreferences(mContext,"cust_name")).putExtra("FrontCamera","0"));
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == GALLERY_IMAGE_REQUEST_CODE) {
+            if (data != null && data.getData() != null) {
+                Uri selectedImageUri = data.getData();
+                try {
+                    Bitmap bitmap  = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+                    File save =saveFile(bitmap,LoginBean.getUsername().trim());
+                     updateValue(String.valueOf(save));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+            }
+        }
 
     }
 
@@ -217,13 +303,7 @@ public class ComplaintImageActivity extends AppCompatActivity implements Complai
                             Log.e("bundle====>", bundle.get("data").toString());
 
 
-                            dataHelper.insertComplaintImage
-                                    (cmp_no,
-                                            image_item,
-                                            cmp_category,
-                                            bundle.get("data").toString());
-                            updateValue();
-                            Log.e("ComplaintImageSize", String.valueOf(databaseHelper.getComplaintImage().size()));
+                            updateValue( bundle.get("data").toString());
 
                         }
 
@@ -231,7 +311,10 @@ public class ComplaintImageActivity extends AppCompatActivity implements Complai
                 }
             });
 
-    private void updateValue() {
+    private void updateValue(String imagePath) {
+
+        dataHelper.insertComplaintImage(cmp_no, image_item, cmp_category, imagePath);
+
         Complaint_Image_Name complaintImageName = new Complaint_Image_Name();
         complaintImageName.setName(complaintImage.getName());
         complaintImageName.setItem(complaintImage.getItem());
@@ -240,4 +323,35 @@ public class ComplaintImageActivity extends AppCompatActivity implements Complai
         arraylist.set(Index,complaintImageName);
         adapter.notifyDataSetChanged();
     }
+
+    public static File saveFile(Bitmap bitmap, String name) {
+        File file = new File(getMediaFilePath(name));
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
+
+    public static String getMediaFilePath(String name) {
+
+        File root = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), GALLERY_DIRECTORY_NAME_COMMON);
+
+        File dir = new File(root.getAbsolutePath() + "/SKAPP/"+ name ); //it is my root directory
+
+        try {
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Create a media file name
+        return dir.getPath() + File.separator + "IMG_"+  String.valueOf(Calendar.getInstance().getTimeInMillis()) +".jpg";
+    }
+
+
 }
