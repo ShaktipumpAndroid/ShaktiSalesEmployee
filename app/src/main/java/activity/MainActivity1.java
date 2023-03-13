@@ -9,9 +9,9 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -35,7 +35,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -45,12 +44,19 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
 import com.shaktipumps.shakti.shaktisalesemployee.BuildConfig;
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import bean.LoginBean;
 import database.DatabaseHelper;
@@ -59,11 +65,12 @@ import webservice.SAPWebService;
 import webservice.WebURL;
 
 
+@SuppressWarnings("deprecation")
 public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener, SharedPreferences.OnSharedPreferenceChangeListener {
-    //Alarm Request Code
-    private static final int ALARM_REQUEST_CODE = 133;
-    private static final String TAG = MainActivity1.class.getSimpleName();
 
+    private static final String TAG = MainActivity1.class.getSimpleName();
+    private AppUpdateManager appUpdateManager;
+    private static final int IMMEDIATE_APP_UPDATE_REQ_CODE = 100;
     // Used in checking for runtime permissions.
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -73,14 +80,9 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
     FusedLocationProviderClient fusedLocationProviderClient;
     // The BroadcastReceiver used to listen from broadcasts from the service.
     private MyReceiver myReceiver;
-    /**
-     * Provides access to the Fused Location Provider API.
-     */
-    private FusedLocationProviderClient mFusedLocationClient;
-    /**
-     * Represents a geographical location.
-     */
-    private Location mCurrentLocation;
+
+
+
     // A reference to the service used to get location updates.
     private LocationUpdatesService mService = null;
     // Tracks the bound state of the service.
@@ -101,20 +103,16 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
             mBound = false;
         }
     };
-    private ArrayList<String> permissions = new ArrayList<>();
-    private ArrayList<String> permissionsToRequest;
+    private final ArrayList<String> permissions = new ArrayList<>();
     ProgressDialog progressBar;
     CustomUtility customUtility;
-    ProgressDialog dialog;
+
     Context mContex;
     String versionName = "0.0";
     DatabaseHelper dataHelper = null;
     SAPWebService con = null;
     SharedPreferences pref;
     SharedPreferences.Editor editor;
-    String newVersion = "0.0";
-    String logout_value = "";
-    String current_date = "null", current_time;
     String latitude = "0.0";
     String longitude = "0.0";
     Handler mHandler = new Handler() {
@@ -126,10 +124,8 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
     };
     private ProgressDialog progressDialog;
     private int progressBarStatus = 0;
-    private Handler progressBarHandler = new Handler();
-    private long fileSize = 0;
-    private Toolbar mToolbar;
-    private FragmentDrawer drawerFragment;
+    private final Handler progressBarHandler = new Handler();
+
     public  static  DatabaseHelper db;
 
     @Override
@@ -141,7 +137,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         con = new SAPWebService();
          db = new DatabaseHelper(MainActivity1.this);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar =  findViewById(R.id.toolbar);
 
         fusedLocationProviderClient = getFusedLocationProviderClient(this);
 
@@ -149,7 +145,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
-        permissionsToRequest = permissionsToRequest(permissions);
+        ArrayList<String> permissionsToRequest = permissionsToRequest(permissions);
 
 
         deleteCache(mContex);
@@ -157,14 +153,14 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         progressDialog = new ProgressDialog(mContex);
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         customUtility = new CustomUtility();
 
         dataHelper = new DatabaseHelper(this);
 
-        drawerFragment = (FragmentDrawer)
+        FragmentDrawer drawerFragment = (FragmentDrawer)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer,  findViewById(R.id.drawer_layout), mToolbar);
         drawerFragment.setDrawerListener(this);
 
 
@@ -198,14 +194,11 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
             }
         }
 
-        if (checkPlayServices()) {
-
-
-        } else {
+        if (!checkPlayServices()) {
             Toast.makeText(mContex, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
         }
 
-/******* Create SharedPreferences *******/
+//******* Create SharedPreferences *******/
 
 
         if (!pref.getString("key_sync_date", "date").equalsIgnoreCase(customUtility.getCurrentDate())) {
@@ -220,7 +213,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
 // set login person name to navigation drawer
 
-        TextView tv = (TextView) findViewById(R.id.ename);
+        TextView tv =  findViewById(R.id.ename);
         tv.setText("Welcome,  " + LoginBean.getUsername() + "   V " + versionName);
 
         // delete data from mobile which is save in sap
@@ -285,30 +278,25 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                 syncOfflineData("1");
                 return true;
             case android.R.id.home:
-                // onBackPressed();
                 return true;
             case R.id.action_signout:
                 new AlertDialog.Builder(this)
                         .setTitle("Sign Out Alert !")
                         .setMessage("Do you want to Sign Out this application ?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // logout
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // logout
 
-                                // syncOfflineData("16");
-                                logOut();
+                            // syncOfflineData("16");
+                            logOut();
 
-                                dialog.cancel();
-                                dialog.dismiss();
+                            dialog.cancel();
+                            dialog.dismiss();
 
-                            }
                         })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // user doesn't want to logout
-                                dialog.cancel();
-                                dialog.dismiss();
-                            }
+                        .setNegativeButton("No", (dialog, which) -> {
+                            // user doesn't want to logout
+                            dialog.cancel();
+                            dialog.dismiss();
                         })
                         .show();
                 return true;
@@ -321,65 +309,51 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         GPSTracker gps = new GPSTracker(mContex);
         latitude = String.valueOf(Double.parseDouble(new DecimalFormat("##.#####").format(gps.getLatitude())));
         longitude = String.valueOf(Double.parseDouble(new DecimalFormat("##.#####").format(gps.getLongitude())));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (CustomUtility.isOnline(MainActivity1.this)) {
-                    if (latitude != null && longitude != null) {
-                        dataHelper.insertEmployeeGPSActivity(
-                                LoginBean.userid,
-                                new CustomUtility().getCurrentDate(),
-                                new CustomUtility().getCurrentTime(),
-                                event,
-                                latitude,
-                                longitude,
-                                mContex,
-                                "");
-                    }
-                    new SyncDataToSAP_New().SendDataToSap(mContex);
-                    if (progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                        progressDialog = null;
-                    }
-                } else {
-                    if (progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                        progressDialog = null;
-                    }
-                    Message msg = new Message();
-                    msg.obj = "No Internet Connection";
-                    mHandler.sendMessage(msg);
-                    //Toast.makeText(MainActivity.this, "No internet Connection. ", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            if (CustomUtility.isOnline(MainActivity1.this)) {
+                if (latitude != null && longitude != null) {
+                    dataHelper.insertEmployeeGPSActivity(
+                            LoginBean.userid,
+                            new CustomUtility().getCurrentDate(),
+                            new CustomUtility().getCurrentTime(),
+                            event,
+                            latitude,
+                            longitude,
+                            mContex,
+                            "");
                 }
+                new SyncDataToSAP_New().SendDataToSap(mContex);
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+            } else {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+                Message msg = new Message();
+                msg.obj = "No Internet Connection";
+                mHandler.sendMessage(msg);
             }
         }).start();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            fragment.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 
     public void logOut() {
         progressDialog = ProgressDialog.show(MainActivity1.this, "", "Sync Offline Data !");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (CustomUtility.isOnline(MainActivity1.this)) {
-                 CustomUtility.logoutUser(MainActivity1.this);
+        new Thread(() -> {
+            if (CustomUtility.isOnline(MainActivity1.this)) {
+             CustomUtility.logoutUser(MainActivity1.this);
 
-                } else {
-                    if (progressDialog != null && progressDialog.isShowing()) {
-                        progressDialog.dismiss();
-                        progressDialog = null;
-                    }
-                    Message msg = new Message();
-                    msg.obj = "No internet Connection. Log Out Failed";
-                    mHandler.sendMessage(msg);
+            } else {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
                 }
+                Message msg = new Message();
+                msg.obj = "No internet Connection. Log Out Failed";
+                mHandler.sendMessage(msg);
             }
         }
         ).start();
@@ -392,22 +366,19 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
     private void displayView(int position) {
         Fragment fragment = null;
-        Intent intent = null;
-        Context ctx = null;
+        Intent intent ;
+        Context ctx;
         switch (position) {
             case 0:
                 fragment = new HomeFragment();
-                //   title = getString(R.string.title_home);
                 break;
             case 1:
                 intent = new Intent(MainActivity1.this, AttendanceReportActivity.class);
                 startActivity(intent);
-                // title = getString(R.string.title_friends);
                 break;
             case 2:
                 intent = new Intent(MainActivity1.this, DeviceStatusActivity.class);
                 startActivity(intent);
-                // title = getString(R.string.title_friends);
                 break;
             case 3:
                 intent = new Intent(MainActivity1.this, RoutePlanSearchActivity.class);
@@ -419,29 +390,26 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                 break;
             case 5:
                 progressDialog = ProgressDialog.show(MainActivity1.this, "", "Loading..");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CustomUtility.isOnline(MainActivity1.this)) {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            Intent intent = new Intent(MainActivity1.this, FileActivity.class);
-                            intent.putExtra("call_portal", "Files & Folder");
-                            startActivity(intent);
-                        } else {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            Message msg = new Message();
-                            msg.obj = "Please ON Internet Connection For This Function.";
-                            mHandler.sendMessage(msg);
-
+                new Thread(() -> {
+                    if (CustomUtility.isOnline(MainActivity1.this)) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
+                        Intent intent1 = new Intent(MainActivity1.this, FileActivity.class);
+                        intent1.putExtra("call_portal", "Files & Folder");
+                        startActivity(intent1);
+                    } else {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                        Message msg = new Message();
+                        msg.obj = "Please ON Internet Connection For This Function.";
+                        mHandler.sendMessage(msg);
 
                     }
+
                 }).start();
 
 
@@ -457,32 +425,29 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
                 progressDialog = ProgressDialog.show(MainActivity1.this, "", "Loading..");
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CustomUtility.isOnline(MainActivity1.this)) {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.CABLE_SELECTION));
-                            startActivity(browserIntent);
-
-                        } else {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-                            Message msg = new Message();
-                            msg.obj = "Please ON Internet Connection For This Function.";
-                            mHandler.sendMessage(msg);
-
+                new Thread(() -> {
+                    if (CustomUtility.isOnline(MainActivity1.this)) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
 
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.CABLE_SELECTION));
+                        startActivity(browserIntent);
+
+                    } else {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+
+                        Message msg = new Message();
+                        msg.obj = "Please ON Internet Connection For This Function.";
+                        mHandler.sendMessage(msg);
+
                     }
+
                 }).start();
 
                 break;
@@ -492,32 +457,29 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
                 progressDialog = ProgressDialog.show(MainActivity1.this, "", "Loading..");
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CustomUtility.isOnline(MainActivity1.this)) {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.PIPE_SELECTION));
-                            startActivity(browserIntent);
-
-                        } else {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-                            Message msg = new Message();
-                            msg.obj = "Please ON Internet Connection For This Function.";
-                            mHandler.sendMessage(msg);
-
+                new Thread(() -> {
+                    if (CustomUtility.isOnline(MainActivity1.this)) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
 
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.PIPE_SELECTION));
+                        startActivity(browserIntent);
+
+                    } else {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+
+                        Message msg = new Message();
+                        msg.obj = "Please ON Internet Connection For This Function.";
+                        mHandler.sendMessage(msg);
+
                     }
+
                 }).start();
 
                 break;
@@ -525,47 +487,33 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
             case 9:
 
-                //   shakti chat app
-//                 ctx=this; // or you can replace **'this'** with your **ActivityName.this**
-//                try {
-//                    Intent i = ctx.getPackageManager().getLaunchIntentForPackage("com.shaktichat.shaktichatapp");
-//                    ctx.startActivity(i);
-//                } catch (Exception e)
-//                {
-//                    Toast.makeText(this,"Please Install Shakti Chat App From Play Store",Toast.LENGTH_SHORT).show();
-//                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.shaktichat.shaktichatapp")));
-//                }
-//
 
 
                 progressDialog = ProgressDialog.show(MainActivity1.this, "", "Loading..");
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CustomUtility.isOnline(MainActivity1.this)) {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.SOLAR_CABLE_SELECTION));
-                            startActivity(browserIntent);
-
-                        } else {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-                            Message msg = new Message();
-                            msg.obj = "Please ON Internet Connection For This Function.";
-                            mHandler.sendMessage(msg);
-
+                new Thread(() -> {
+                    if (CustomUtility.isOnline(MainActivity1.this)) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
 
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(WebURL.SOLAR_CABLE_SELECTION));
+                        startActivity(browserIntent);
+
+                    } else {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+
+                        Message msg = new Message();
+                        msg.obj = "Please ON Internet Connection For This Function.";
+                        mHandler.sendMessage(msg);
+
                     }
+
                 }).start();
 
 
@@ -621,32 +569,29 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
                 progressDialog = ProgressDialog.show(MainActivity1.this, "", "Loading..");
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CustomUtility.isOnline(MainActivity1.this)) {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.shaktipumps.com/faq.php"));
-                            startActivity(browserIntent);
-
-                        } else {
-                            if (progressDialog != null && progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                                progressDialog = null;
-                            }
-                            ;
-                            Message msg = new Message();
-                            msg.obj = "Please ON Internet Connection For This Function.";
-                            mHandler.sendMessage(msg);
-
+                new Thread(() -> {
+                    if (CustomUtility.isOnline(MainActivity1.this)) {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
 
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.shaktipumps.com/faq.php"));
+                        startActivity(browserIntent);
+
+                    } else {
+                        if (progressDialog != null && progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+
+                        Message msg = new Message();
+                        msg.obj = "Please ON Internet Connection For This Function.";
+                        mHandler.sendMessage(msg);
+
                     }
+
                 }).start();
 
                 break;
@@ -675,7 +620,6 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         // creating progress bar dialog
         progressBar = new ProgressDialog(this);
         progressBar.setCancelable(false);
-        // progressBar.setCancelable(true);
         progressBar.setMessage("Downloading Data...");
         progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressBar.setProgress(0);
@@ -683,8 +627,6 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         progressBar.show();
         //reset progress bar and filesize status
         progressBarStatus = 0;
-        fileSize = 0;
-
 
         new Thread(new Runnable() {
             public void run() {
@@ -702,29 +644,19 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                             progressBarStatus = 20;
 
                             // Updating the progress bar
-                            progressBarHandler.post(new Runnable() {
-                                public void run() {
-
-                                    progressBar.setProgress(progressBarStatus);
-                                }
-                            });
+                            progressBarHandler.post(() -> progressBar.setProgress(progressBarStatus));
 
 
-                            /************** sync material */
+                            //************** sync material */
 
                             dataHelper.deleteAdhocOrder();
                             progressBarStatus = con.getMaterialDetail(MainActivity1.this);
 
                             // Updating the progress bar
-                            progressBarHandler.post(new Runnable() {
-                                public void run() {
-
-                                    progressBar.setProgress(progressBarStatus);
-                                }
-                            });
+                            progressBarHandler.post(() -> progressBar.setProgress(progressBarStatus));
 
 
-                            /************** sync material */
+                            //************** sync material */
 
 
                             // get target vs achievement
@@ -735,12 +667,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
 
                             // Updating the progress bar
-                            progressBarHandler.post(new Runnable() {
-                                public void run() {
-
-                                    progressBar.setProgress(progressBarStatus);
-                                }
-                            });
+                            progressBarHandler.post(() -> progressBar.setProgress(progressBarStatus));
 
 
                             // get search help
@@ -748,12 +675,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
 
                             // Updating the progress bar
-                            progressBarHandler.post(new Runnable() {
-                                public void run() {
-
-                                    progressBar.setProgress(progressBarStatus);
-                                }
-                            });
+                            progressBarHandler.post(() -> progressBar.setProgress(progressBarStatus));
 
 
                             // get route plan
@@ -761,12 +683,7 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
 
 
                             // Updating the progress bar
-                            progressBarHandler.post(new Runnable() {
-                                public void run() {
-
-                                    progressBar.setProgress(progressBarStatus);
-                                }
-                            });
+                            progressBarHandler.post(() -> progressBar.setProgress(progressBarStatus));
 
 
                         } catch (Exception e) {
@@ -811,10 +728,8 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
         db.deleteDSREntry();
         db.deleteNewAddedCustomer();
         db.deleteMarkAttendance();
-        // db.deleteLocalconvenienceDetail();
         db.deleteComplaintInprocessAction();
-      /*  db.deleteCustomerComplaintHeader();
-        db.deleteCustomerComplaintDetail();*/
+
         db.deleteClouserComplaint();
         db.deleteComplaintImage();
         db.deleteComplaintAudio();
@@ -832,26 +747,18 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                 .registerOnSharedPreferenceChangeListener(this);
 
         Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!checkPermissions()) {
-                            requestPermissions();
-                        } else if (mService != null) { // add null checker
-                            mService.requestLocationUpdates();
-                        }
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+        handler.post(() -> runOnUiThread(() -> {
+            if (!checkPermissions()) {
+                requestPermissions();
+            } else if (mService != null) { // add null checker
+                mService.requestLocationUpdates();
             }
-        });
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
 
 
         mContex.bindService(new Intent(mContex, LocationUpdatesService.class), mServiceConnection,
@@ -900,13 +807,12 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
     /**
      * Receiver for broadcasts sent by {@link LocationUpdatesService}.
      */
-    private class MyReceiver extends BroadcastReceiver {
+    private static class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Location location = intent.getParcelableExtra(LocationUpdatesService.EXTRA_LOCATION);
             if (location != null) {
-                //Toast.makeText(MainActivity.this, Utils.getLocationText(location),
-                //      Toast.LENGTH_SHORT).show();
+
             }
         }
     }
@@ -968,19 +874,16 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                                 findViewById(R.id.lin1),
                                 R.string.permission_denied_explanation,
                                 Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                // Build intent that displays the App settings screen.
-                                Intent intent = new Intent();
-                                intent.setAction(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package",
-                                        BuildConfig.APPLICATION_ID, null);
-                                intent.setData(uri);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
+                        .setAction(R.string.settings, view -> {
+                            // Build intent that displays the App settings screen.
+                            Intent intent = new Intent();
+                            intent.setAction(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package",
+                                    BuildConfig.APPLICATION_ID, null);
+                            intent.setData(uri);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
                         })
                         .show();
             }
@@ -1007,14 +910,11 @@ public class MainActivity1 extends AppCompatActivity implements FragmentDrawer.F
                     findViewById(R.id.lin1),
                     R.string.permission_rationale,
                     Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            ActivityCompat.requestPermissions(MainActivity1.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    REQUEST_PERMISSIONS_REQUEST_CODE);
-                        }
+                    .setAction(R.string.ok, view -> {
+                        // Request permission
+                        ActivityCompat.requestPermissions(MainActivity1.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                REQUEST_PERMISSIONS_REQUEST_CODE);
                     })
                     .show();
         } else {
