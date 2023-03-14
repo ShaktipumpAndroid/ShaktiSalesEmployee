@@ -130,6 +130,11 @@
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
     <string name="cancle">Cancle</string>
+    <string name="Loading">Loading...</string>
+    <string name="no_data_available">No Data Available</string>
+    <string name="complaintImages">Complaint Images</string>
+    <string name="photo_gallary">Photo Gallery</string>
+    <string name="net_connection">Please check your internet connectio</string>
 
     <string-array name="array_paymnet_by">
         <item>Pay By</item>

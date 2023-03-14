@@ -5,52 +5,37 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.Message;
-import android.util.Base64;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.shaktipumps.shakti.shaktisalesemployee.R;
 
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import activity.CustomUtility;
 import activity.complaint.PhotoViewerActivity;
-import activity.complaint.ShowDocument1;
-import bean.vkbean.RemarkResponseList;
+import model.ComplaintImageModel;
+import webservice.Constants;
 
 
 public class PendingComplainGridListAdapter extends RecyclerView.Adapter<PendingComplainGridListAdapter.ViewHolder> {
 
     private Context mContext;
-    private String mStatusValue;
-    private String mMobileNumber;
-    byte[] encodeByte;
-    Bitmap bitmap;
 
-    private List<RemarkResponseList> mRemarkResponseList;
+    private List<ComplaintImageModel.Response> complaintImageList;
 
-   /* public PendingComplainListAdapter(Context mContext, List<ComplainAllResponse> mComplainAllResponse) {
-        // this.galleryModelsList = galleryModelsList;
+
+
+    public PendingComplainGridListAdapter(Context mContext, List<ComplaintImageModel.Response> complaintImageList) {
         this.mContext = mContext;
-        this.mComplainAllResponse = mComplainAllResponse;
-
-    }*/
-   ArrayList<String> al;
-
-    public PendingComplainGridListAdapter(Context mContext, ArrayList<String> al, String mStatusValue) {
-        this.mContext = mContext;
-        this.al = al;
-        this.mStatusValue = mStatusValue;
+         this.complaintImageList = complaintImageList;
 
     }
 
@@ -64,24 +49,27 @@ public class PendingComplainGridListAdapter extends RecyclerView.Adapter<Pending
     @Override
     public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
-       // holder.imgGRIDID.setImageResource(Integer.parseInt(al.get(position)));
-        if (al.get(position) != null && !al.get(position).isEmpty()) {
-            encodeByte = Base64.decode(al.get(position), Base64.DEFAULT);
-            bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            holder.imgGRIDID.setImageBitmap(bitmap);
-        }
+
+        ComplaintImageModel.Response complaintImageModel = complaintImageList.get(position);
+      //       holder.imgComplaint.setImageBitmap(CustomUtility.getBitmapFromBase64(complaintImageModel.getImage1().trim()));
+        Glide.with(mContext).load(CustomUtility.getBitmapFromBase64(complaintImageModel.getImage1().trim())).placeholder(R.mipmap.ic_notification).dontAnimate().into(holder.imgComplaint);
 
 
-        holder.imgGRIDID.setOnClickListener(new View.OnClickListener() {
+        holder.imgComplaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent i_display_image = new Intent(mContext, PhotoViewerActivity.class);
-                Bundle extras = new Bundle();
-                extras.putString("key", al.get(position));
-                i_display_image.putExtras(extras);
-                mContext.startActivity(i_display_image);
+                /*Intent intent = new Intent(mContext, PhotoViewerActivity.class);
+                intent.putExtra(Constants.complaintImageModel, complaintImageModel);
+                mContext.startActivity(intent);*/
 
+                Bitmap bitmap = ((BitmapDrawable) holder.imgComplaint.getDrawable()).getBitmap();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] imageInByte = baos.toByteArray();
+                Intent intent = new Intent(mContext, PhotoViewerActivity.class);
+                intent.putExtra(Constants.complaintImageModel, imageInByte);
+                mContext.startActivity(intent);
 
             }
         });
@@ -91,54 +79,21 @@ public class PendingComplainGridListAdapter extends RecyclerView.Adapter<Pending
 
     @Override
     public int getItemCount() {
-        // return galleryModelsList.size();
-        if (al != null && al.size() > 0)
-            return al.size();
-        else
-            return 0;
+       return complaintImageList.size();
 
-        //  return 5;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        public ImageView imgComplaint;
 
+        public ViewHolder(View view) {
+            super(view);
 
+            imgComplaint = view.findViewById(R.id.imgComplaint);
 
-
-        public TextView txtRemarkActionValueID, txtRemarkEnameValueID,txtRemarkComplainnoValueID,txtRemarkDateValueID;
-
-
-
-        public RelativeLayout rlvNotifyItemMainViewID;
-        public LinearLayout lvlMainItemViewID;
-        public TextView txtBTNActionID, txtBTNPendingID, txtBTNClodeID, txtBTNUploadID;
-        public ImageView imgGRIDID;
-
-        public ViewHolder(View v) {
-
-            super(v);
-
-            imgGRIDID = (ImageView) v.findViewById(R.id.imgGRIDID);
-
-
-            //  txtWarrantyValueID =   (TextView) v.findViewById(R.id.txtWarrantyValueID);
-
-          }
-    }
-
-
-
-
-
-    android.os.Handler mHandler = new android.os.Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            String mString = (String) msg.obj;
-            Toast.makeText(mContext, mString, Toast.LENGTH_LONG).show();
         }
-    };
-
+    }
 
 }
 

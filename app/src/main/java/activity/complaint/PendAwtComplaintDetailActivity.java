@@ -1,6 +1,7 @@
 package activity.complaint;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -222,7 +223,7 @@ public class PendAwtComplaintDetailActivity extends AppCompatActivity {
 
                     }
                     else {
-                        download(cmp_no);
+                        //download(cmp_no);
                     }
                 }
                 else{
@@ -375,13 +376,15 @@ public class PendAwtComplaintDetailActivity extends AppCompatActivity {
                 return true;
             case R.id.action_complaint_attachment:
                 PathUtil.setSharedPreference(mContext, "cmpno", cmp_no);
-                Intent i = new Intent(PendAwtComplaintDetailActivity.this, ComplaintAttachmentActivity.class);
+                Intent i = new Intent(PendAwtComplaintDetailActivity.this, PendingComplainPhotoGridActivity.class);
+                i.putExtra("Complain_number", cmp_no);
                 startActivity(i);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("Range")
     public void getComplaintHeader() {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -434,6 +437,7 @@ public class PendAwtComplaintDetailActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("Range")
     public void getComplaintDetail() {
 
 
@@ -633,7 +637,7 @@ public class PendAwtComplaintDetailActivity extends AppCompatActivity {
 
     }
 
-    public void download(String cmpno1) {
+   /* public void download(String cmpno1) {
 
 
         // creating progress bar dialog
@@ -703,7 +707,7 @@ public class PendAwtComplaintDetailActivity extends AppCompatActivity {
 
 
     }
-
+*/
 
 
 }

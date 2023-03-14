@@ -195,25 +195,18 @@ public class CustomUtility {
     }
 
     public static boolean isOnline(Context mContext) {
-        try {
-            ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            connected = networkInfo != null && networkInfo.isAvailable() &&
-                    networkInfo.isConnected();
-            Log.v("network", String.valueOf(connected));
-
-//                Process p1 = Runtime.getRuntime().exec("ping -c 1 www.google.com");
-//                int returnVal = p1.waitFor();
-//                Log.v("ping",   String.valueOf(  returnVal ) );
-//                connected = (returnVal == 0);
-//                return connected;
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-        } catch (Exception e) {
-            Log.v("connectivity", e.toString());
+        ConnectivityManager connectivity =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null) {
+                for (NetworkInfo networkInfo : info)
+                    if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+                        return true;
+                    }
+            }
         }
-        return connected;
+        return false;
     }
 
     public static boolean CheckGPS(Context mContext) {
@@ -306,6 +299,12 @@ public class CustomUtility {
         Intent myService = new Intent(context, LocationUpdatesService.class);
         context.stopService(myService);
 
+    }
+
+    public static Bitmap getBitmapFromBase64(String base64String) {
+
+        byte[] decodedString = Base64.decode(base64String, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
     public String getCurrentDate() {

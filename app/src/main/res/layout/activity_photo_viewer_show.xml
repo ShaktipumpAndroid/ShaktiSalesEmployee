@@ -10,32 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_40sdp"
-        android:background="@color/blue_fb"
-        >
-
-        <ImageView
-            android:id="@+id/imgBackID"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="match_parent"
-            android:src="@drawable/icn_back"
-            android:padding="@dimen/_12sdp"
-            />
-
-        <TextView
-            android:visibility="visible"
-            android:id="@+id/txtHeaderID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Complain Details"
-            android:layout_centerInParent="true"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14ssp"
-            android:textStyle="bold"/>
-
-    </RelativeLayout>
+     <include layout="@layout/toolbar"/>
 
     <ImageView
         android:id="@+id/imageView"

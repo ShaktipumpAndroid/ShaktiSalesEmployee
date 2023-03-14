@@ -1,5 +1,6 @@
 package activity.complaint;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -116,7 +117,7 @@ public class ComplaintAttachmentActivity extends AppCompatActivity {
             getComplaint_Image(cmp_no);
         }
         else {
-            download(cmp_no);
+           // download(cmp_no);
             getComplaint_Image(cmp_no);
         }
 
@@ -336,6 +337,7 @@ public class ComplaintAttachmentActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("Range")
     public void getComplaint_Image(String cmp_no1) {
 
         DatabaseHelper dataHelper = new DatabaseHelper(this);
@@ -537,7 +539,7 @@ public class ComplaintAttachmentActivity extends AppCompatActivity {
     }
 
 
-    public void download(String cmpno1) {
+   /* public void download(String cmpno1) {
 
 
         // creating progress bar dialog
@@ -607,7 +609,7 @@ public class ComplaintAttachmentActivity extends AppCompatActivity {
 
 
     }
-
+*/
 
 
 }

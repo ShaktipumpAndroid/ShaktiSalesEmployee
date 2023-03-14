@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import activity.complaint.PendingComplainPhotoGridActivity;
 import bean.LoginBean;
 import database.DatabaseHelper;
 import webservice.CustomHttpClient;
@@ -120,7 +121,11 @@ public class DisplayReviewComplaintDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (CustomUtility.isOnline(mContext)) {
+                Intent mIntent = new Intent(mContext, PendingComplainPhotoGridActivity.class);
+                mIntent.putExtra("Complain_number",cmp_no_txt);
+                mContext.startActivity(mIntent);
+
+                /*if (CustomUtility.isOnline(mContext)) {
                     // Write Your Code What you want to do
                     if (db.isEmpty(db.TABLE_REVIEW_COMPLAINT_IMAGES)) {
                         ReviewComplaintImageList();
@@ -145,7 +150,7 @@ public class DisplayReviewComplaintDetailActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(mContext, "No internet Connection", Toast.LENGTH_SHORT).show();
                     }
-                }
+                }*/
             }
         });
 
@@ -534,118 +539,5 @@ public class DisplayReviewComplaintDetailActivity extends AppCompatActivity {
     }
 
 
-    private void ReviewComplaintImageList() {
 
-        try {
-
-            progressDialog = ProgressDialog.show(mContext, "Loading...", "Please wait...");
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
-
-                    param.add(new BasicNameValuePair("cmpno", cmp_no_txt));
-                    param.add(new BasicNameValuePair("posnr", item_no_txt));
-
-                    try {
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().build();
-                        StrictMode.setThreadPolicy(policy);
-
-                        obj = CustomHttpClient.executeHttpPost1(WebURL.IMAGES_REVIEW_COMPLAINT, param);
-
-                        Log.e("DATA", "&&&&" + obj);
-
-                        //db.deleteReviewCmpImages();
-
-                        if (obj != "") {
-
-                            final JSONArray jo_success = new JSONArray(obj);
-
-                            for (int i = 0; i < jo_success.length(); i++) {
-
-
-                                JSONObject jo = jo_success.getJSONObject(i);
-
-                                image_name = jo.getString("image_1");
-                                image_name1 = jo.getString("image_2");
-                                image_name2 = jo.getString("image_3");
-                                image_name3 = jo.getString("image_4");
-                                image_name4 = jo.getString("image_5");
-                                image_name5 = jo.getString("image_6");
-                                image_name6 = jo.getString("image_7");
-                                image_name7 = jo.getString("image_8");
-                                image_name8 = jo.getString("image_9");
-                                image_name9 = jo.getString("image_10");
-                                image_name10 = jo.getString("image_11");
-                                image_name11 = jo.getString("image_12");
-                                image_name12 = jo.getString("image_13");
-                                image_name13 = jo.getString("image_14");
-                                image_name14 = jo.getString("image_15");
-
-                                Log.e("IMAGE", "&&&&&" + image_name);
-
-
-                                  if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        };
-
-                                if (!image_name.equals("") || !image_name1.equals("") || !image_name2.equals("") || !image_name3.equals("") || !image_name4.equals("") || !image_name5.equals("") || !image_name6.equals("") || !image_name7.equals("") || !image_name8.equals("") || !image_name9.equals("") || !image_name10.equals("") || !image_name11.equals("") || !image_name12.equals("") || !image_name13.equals("") || !image_name14.equals("")) {
-                                    db.insertReviewCmpImage
-                                            (cmp_no_txt, image_name, image_name1, image_name2, image_name3, image_name4, image_name5, image_name6, image_name7, image_name8, image_name9, image_name10, image_name11, image_name12, image_name13, image_name14);
-
-                                    Intent intent = new Intent(DisplayReviewComplaintDetailActivity.this, ReviewCmpImageListActivity.class);
-                                    intent.putExtra("cmpno", cmp_no_txt);
-                                    startActivity(intent);
-                                } else {
-                                    runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            Message msg = new Message();
-                                            msg.obj = "Complaint Images not Available";
-                                            mHandler.sendMessage(msg);
-                                        }
-                                    });
-                                }
-
-                            }
-
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-
-                                      if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        };
-
-
-                                }
-
-                            });
-                        }
-                    } catch (Exception e) {
-
-                          if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        };
-                        e.printStackTrace();
-
-                    }
-//
-                }
-            }).start();
-
-
-        } catch (Exception e) {
-
-              if ((progressDialog != null) && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        };
-
-        }
-
-    }
 }
