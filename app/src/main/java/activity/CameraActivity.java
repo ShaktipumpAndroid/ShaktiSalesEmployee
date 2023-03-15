@@ -265,7 +265,7 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(110);
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.BLUE);
         paint.setStyle(Paint.Style.FILL);
         paint.setFakeBoldText(true);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -288,17 +288,17 @@ public class CameraActivity extends AppCompatActivity implements SurfaceHolder.C
 
        // int radius = x > y ? x/2 : y/2;
         Paint paintb = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintb.setColor(Color.WHITE);
+        paintb.setColor(Color.TRANSPARENT);
         paintb.setStyle(Paint.Style.FILL); //fill the background with blue color
-        canvas.drawRect(x - 9000, y + 9000, x + 9000, y + 2400, paintb);
+        canvas.drawRect(x -4000, y +4000, x + 4000, y + 1400, paintb);
 
         // canvas.drawColor(-1);
-        canvas.drawText(text1, x * scale-1100,y * scale +950 , paint);
-        canvas.drawText(text2, x * scale -1100,y * scale + 1050, paint);
-        canvas.drawText(text3, x * scale -1100,y * scale + 1150, paint);
-        canvas.drawText(text, x * scale -1100,y * scale + 1250, paint);
-        canvas.drawText(text4+" "+text5, x * scale-1100,y * scale +1350, paint);
-        canvas.drawText(text6, x * scale-1100,y * scale + 1450, paint);
+        canvas.drawText(text1, x * scale -1500,y * scale + 1550 , paint);
+        canvas.drawText(text2, x * scale -1500,y * scale + 1650, paint);
+        canvas.drawText(text3, x * scale -1500,y * scale + 1750, paint);
+        canvas.drawText(text, x * scale -1500,y * scale + 1850, paint);
+        canvas.drawText(text4+" "+text5, x * scale-1500,y * scale +1950, paint);
+        canvas.drawText(text6, x * scale-1500,y * scale + 2050, paint);
         return bmp;
     }
 
